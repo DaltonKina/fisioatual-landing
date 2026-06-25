@@ -9,7 +9,7 @@
   canvas.height = SIZE;
   const ctx = canvas.getContext('2d');
 
-  const SPEED_FACTOR = 5;  // 5x mais lento que o delay original
+  const SPEED_FACTOR = 20; // 20x mais lento que o delay original
   const BLEND_FRAMES = 8;  // frames de cross-fade entre quadros
   const MAX_FRAMES   = 200; // limite de segurança de quadros
 
