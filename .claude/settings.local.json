@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(python -c \"import PIL; print\\(PIL.__version__\\)\")",
+      "PowerShell(Set-Location *)",
+      "PowerShell(node \"$env:TEMP\\\\logo-proc\\\\inspect.mjs\" 2>&1)"
+    ]
+  }
+}

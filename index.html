@@ -1,0 +1,1610 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Fisioatual — Simulador robótico com realidade virtual para neuroreabilitação. FAPESP PIPE Fase 2. Validado em 7 congressos mundiais. Tecnologia 100% nacional.">
+<meta property="og:title" content="Fisioatual | Neuroreabilitação com Robótica e Realidade Virtual">
+<meta property="og:description" content="Hardware + SaaS que transforma sessões de fisioterapia em experiências imersivas. Financiado pela FAPESP. Apresentado no WCPT 2025 Tokyo.">
+<title>Fisioatual — Neuroreabilitação do Futuro, Hoje</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   RESET & VARIABLES
+═══════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g:#00c562;--g2:#00a050;--g-dim:rgba(0,197,98,.1);--g-border:rgba(0,197,98,.2);
+  --o:#ff5c1a;--o2:#e04800;--o-dim:rgba(255,92,26,.1);--o-border:rgba(255,92,26,.22);
+  --gray:#808080;--gray2:rgba(128,128,128,.15);--gray3:rgba(128,128,128,.08);
+  --dark:#080d0a;--dark2:#0f1a12;--dark3:#162019;
+  --glass:rgba(255,255,255,.06);--glass2:rgba(255,255,255,.1);
+  --border:rgba(255,255,255,.08);--border2:rgba(0,197,98,.2);
+  --text:#e8f0eb;--muted:rgba(232,240,235,.55);--dim:rgba(232,240,235,.3);
+  --r:12px;--r2:20px;--r3:28px;
+  --fh:'Bebas Neue',sans-serif;
+  --fb:'Manrope',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--fb);background:var(--dark);color:var(--text);overflow-x:hidden;line-height:1.6}
+img{display:block;max-width:100%;height:auto}
+a{color:inherit;text-decoration:none}
+ul,ol{list-style:none}
+button{font-family:inherit;cursor:pointer}
+
+/* NOISE OVERLAY */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity:.4;
+}
+
+/* ═══════════════════════════════════════════
+   TYPOGRAPHY HELPERS
+═══════════════════════════════════════════ */
+.section-tag{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:.7rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--g);margin-bottom:.75rem;
+}
+.section-tag::before{content:'';width:24px;height:1.5px;background:var(--g)}
+.section-h{
+  font-family:var(--fh);
+  font-size:clamp(2.75rem,5.5vw,5rem);
+  color:white;text-transform:uppercase;line-height:.93;
+  letter-spacing:.01em;margin-bottom:1.25rem;
+}
+.section-h .light{
+  color:var(--muted);font-size:.52em;text-transform:none;
+  font-family:var(--fb);font-weight:300;letter-spacing:-.02em;
+  display:block;line-height:1.25;margin-bottom:.35rem;
+}
+.section-p{font-size:.975rem;color:var(--muted);max-width:520px;line-height:1.85;margin-bottom:3.5rem}
+.section-p strong{color:var(--text)}
+.accent-g{color:var(--g)}
+.accent-o{color:var(--o)}
+
+/* ═══════════════════════════════════════════
+   SCROLL REVEAL
+═══════════════════════════════════════════ */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:.12s}
+.reveal-delay-2{transition-delay:.24s}
+.reveal-delay-3{transition-delay:.36s}
+
+/* ═══════════════════════════════════════════
+   NAV
+═══════════════════════════════════════════ */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:999;
+  height:64px;padding:0 5vw;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--border);
+  background:rgba(8,13,10,.85);backdrop-filter:blur(20px);
+  transition:all .3s;
+}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-text{font-family:var(--fb);font-weight:800;font-size:1.05rem;color:var(--gray);letter-spacing:-.02em}
+.logo-text span{color:var(--g)}
+.nav-pill{display:flex;align-items:center;gap:.5rem;background:var(--glass);border:1px solid var(--border2);border-radius:100px;padding:.3rem .5rem .3rem .9rem}
+.nav-pill a{font-size:.8rem;color:var(--muted);text-decoration:none;padding:0 .6rem;transition:color .2s}
+.nav-pill a:hover{color:var(--text)}
+.nav-cta{background:var(--g)!important;color:#000!important;padding:.4rem 1rem!important;border-radius:100px;font-size:.8rem!important;font-weight:700!important;border:none;cursor:pointer;text-decoration:none;transition:background .2s,transform .15s;display:inline-block}
+.nav-cta:hover{background:var(--g2)!important;transform:scale(1.03)}
+.hamburger{display:none;flex-direction:column;gap:5px;padding:6px;background:none;border:none}
+.hamburger span{display:block;width:20px;height:2px;background:var(--text);border-radius:2px;transition:.3s}
+.hamburger.active span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.hamburger.active span:nth-child(2){opacity:0}
+.hamburger.active span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.mobile-menu{display:none;position:fixed;inset:0;background:rgba(8,13,10,.97);z-index:1050;flex-direction:column;align-items:center;justify-content:center;gap:2.5rem;opacity:0;pointer-events:none;transition:opacity .4s}
+.mobile-menu.open{opacity:1;pointer-events:all}
+.mobile-menu a{font-family:var(--fh);font-size:2.5rem;color:var(--text);letter-spacing:.03em;text-transform:uppercase;transition:color .2s}
+.mobile-menu a:hover{color:var(--g)}
+
+/* ═══════════════════════════════════════════
+   HERO
+═══════════════════════════════════════════ */
+.hero{min-height:100vh;padding:100px 5vw 60px;display:flex;align-items:center;position:relative;overflow:hidden}
+.hero-glow{position:absolute;top:20%;left:50%;transform:translateX(-50%);width:900px;height:600px;background:radial-gradient(ellipse,rgba(0,197,98,.13) 0%,transparent 70%);pointer-events:none}
+.hero-glow-o{position:absolute;bottom:10%;right:-100px;width:500px;height:400px;background:radial-gradient(ellipse,rgba(255,92,26,.07) 0%,transparent 70%);pointer-events:none}
+.hero-grid-lines{position:absolute;inset:0;z-index:0;opacity:.05;background-image:linear-gradient(rgba(0,197,98,.7) 1px,transparent 1px),linear-gradient(90deg,rgba(0,197,98,.7) 1px,transparent 1px);background-size:80px 80px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 0%,transparent 100%)}
+.hero-inner{position:relative;z-index:3;max-width:860px;margin:0 auto;width:100%;display:block}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:.7rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--g);margin-bottom:1.25rem}
+.pulse-dot{width:7px;height:7px;border-radius:50%;background:var(--g);animation:pdot 2.2s ease-in-out infinite}
+@keyframes pdot{0%,100%{box-shadow:0 0 0 0 rgba(0,197,98,.5)}50%{box-shadow:0 0 0 7px rgba(0,197,98,0)}}
+.hero h1{font-family:var(--fh);font-size:clamp(3.5rem,7vw,6.5rem);line-height:.93;letter-spacing:.01em;color:white;margin-bottom:1.5rem;text-transform:uppercase}
+.hero h1 .accent{color:var(--g)}
+.hero h1 .thin{font-family:var(--fb);font-size:clamp(1.5rem,3vw,2.5rem);font-weight:300;text-transform:none;letter-spacing:-.02em;display:block;color:var(--muted);margin-bottom:.3rem}
+.hero-sub{font-size:1rem;color:var(--muted);max-width:640px;line-height:1.8;margin-bottom:2.5rem;font-weight:400}
+.hero-sub strong{color:var(--text);font-weight:600}
+.hero-btns{display:flex;gap:.875rem;flex-wrap:wrap;margin-bottom:3rem}
+.btn-main{background:var(--g);color:#000;font-weight:700;font-size:.92rem;padding:.875rem 2rem;border-radius:100px;border:none;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:background .2s,transform .15s,box-shadow .2s}
+.btn-main:hover{background:var(--g2);transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,197,98,.3)}
+.btn-outline{background:transparent;color:var(--text);font-weight:500;font-size:.92rem;padding:.875rem 2rem;border-radius:100px;border:1px solid var(--border2);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:border-color .2s,background .2s}
+.btn-outline:hover{background:var(--g-dim);border-color:var(--g)}
+.btn-orange{background:var(--o);color:#fff;font-weight:700;font-size:.92rem;padding:.875rem 2rem;border-radius:100px;border:none;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:background .2s,transform .15s}
+.btn-orange:hover{background:var(--o2);transform:translateY(-2px)}
+.hero-pain{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-radius:var(--r2);overflow:hidden;border:1px solid var(--border)}
+.pain-item{background:rgba(255,255,255,.07);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:1.25rem 1rem;text-align:center;transition:background .35s,box-shadow .35s}
+.pain-item:hover{background:rgba(255,255,255,.16);box-shadow:inset 0 2px 0 var(--g),inset 0 0 40px rgba(255,255,255,.04)}
+.pain-num{font-family:var(--fh);font-size:2.2rem;color:var(--g);line-height:1;display:block;margin-bottom:.2rem;transition:font-size .3s ease,text-shadow .3s ease}
+.pain-item:hover .pain-num{font-size:2.8rem;text-shadow:0 0 20px rgba(0,197,98,.5)}
+.pain-label{font-size:.72rem;color:var(--gray);text-transform:uppercase;letter-spacing:.07em;line-height:1.4;transition:color .3s,font-size .3s}
+.pain-item:hover .pain-label{color:rgba(232,240,235,.85);font-size:.78rem}
+.hero-video-side{position:relative}
+.hero-video-frame{border-radius:var(--r3);overflow:hidden;border:1px solid var(--border2);aspect-ratio:9/16;max-height:540px;position:relative;background:var(--dark2)}
+.hero-video-frame iframe{width:100%;height:100%;display:block;border:0}
+.hero-video-frame video{width:100%;height:100%;object-fit:cover;display:block;opacity:.85}
+.hero-video-tag{position:absolute;bottom:-1rem;left:50%;transform:translateX(-50%);background:rgba(8,13,10,.9);backdrop-filter:blur(12px);border:1px solid rgba(128,128,128,.25);border-radius:100px;padding:.5rem 1.2rem;white-space:nowrap;font-size:.75rem;font-weight:600;color:var(--gray);letter-spacing:.05em}
+
+/* ═══════════════════════════════════════════
+   MARQUEE (text badges — V3 style)
+═══════════════════════════════════════════ */
+.marquee-section{padding:1.5rem 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);overflow:hidden;background:var(--dark2)}
+.marquee-label{text-align:center;font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);margin-bottom:1.5rem}
+.marquee-track{display:flex;gap:0;width:max-content;animation:mscroll 30s linear infinite}
+@keyframes mscroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.marquee-track-r{display:flex;gap:0;width:max-content;animation:mscroll-r 48s linear infinite}
+@keyframes mscroll-r{0%{transform:translateX(-50%)}100%{transform:translateX(0)}}
+.marquee-item{display:flex;align-items:center;gap:.6rem;padding:0 2.5rem;font-size:.8rem;font-weight:700;letter-spacing:.04em;color:rgba(232,240,235,.4);white-space:nowrap;border-right:1px solid var(--border)}
+.m-badge{padding:.2rem .5rem;border-radius:4px;font-size:.65rem;font-weight:800}
+.mb-blue{background:rgba(0,76,189,.7);color:#7ab4ff}
+.mb-red{background:rgba(200,110,0,.6);color:#ffba4d}
+.mb-green{background:rgba(0,100,60,.6);color:#7ff5b5}
+.mb-orange{background:rgba(200,70,0,.6);color:#ffb280}
+.mb-dark{background:rgba(255,255,255,.08);color:rgba(232,240,235,.7)}
+.mb-teal{background:rgba(0,120,120,.6);color:#7ff5f5}
+
+/* ═══ MARQUEE LOGOS ════════════════════════════ */
+.marquee-section{background:linear-gradient(to bottom,#333 0%,#777 48%,#c8c8c8 100%)!important;border-top:1px solid rgba(255,255,255,.12)!important;border-bottom:1px solid rgba(0,0,0,.1)!important}
+.marquee-label{color:var(--g)!important;letter-spacing:.18em}
+.mq-logo{display:flex;align-items:center;justify-content:center;padding:.58rem 1.6rem;border-right:none;flex-shrink:0;background:none;border-radius:0;margin:0 .5rem;border:none;transition:transform .3s}
+.mq-logo img{height:36px;width:auto;max-width:126px;object-fit:contain;opacity:.92;transition:opacity .3s;filter:drop-shadow(0 1px 4px rgba(0,0,0,.3))}
+.mq-logo:hover{background:none;transform:scale(1.08)}
+.mq-logo:hover img{opacity:1}
+.mq-logo span{display:none}
+
+/* LOGOS GRID (institution logos) */
+.logos-section{padding:3.5rem 5vw;background:linear-gradient(180deg,#111e16 0%,#1e3829 50%,#111e16 100%);border-top:1px solid rgba(0,197,98,.16);border-bottom:1px solid rgba(0,197,98,.16)}
+.logos-section-label{text-align:center;font-size:.65rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(0,197,98,.6);margin-bottom:2rem}
+.logos-grid{max-width:1000px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:1.25rem;flex-wrap:wrap}
+.inst-logo{display:flex;align-items:center;justify-content:center;opacity:.92;transition:opacity .3s,transform .3s,box-shadow .3s;background:rgba(255,255,255,.95);border-radius:10px;padding:.7rem 1.25rem;border:1px solid rgba(255,255,255,.2);box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.inst-logo:hover{opacity:1;transform:scale(1.09);box-shadow:0 4px 18px rgba(0,197,98,.35)}
+.inst-logo img{height:36px;width:auto;max-width:110px;object-fit:contain;display:block}
+.inst-logo.lg img{height:52px;max-width:140px}
+.inst-logo span{display:none}
+
+/* ═══════════════════════════════════════════
+   PAIN / MERCADO (bento grid)
+═══════════════════════════════════════════ */
+.pain-section{padding:8rem 5vw;background:var(--dark)}
+.pain-inner{max-width:1100px;margin:0 auto}
+.pain-bento{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:auto auto;gap:12px}
+.bento-card{background:rgba(15,26,18,.85);border:1px solid var(--border);border-radius:var(--r2);padding:2rem 1.75rem;position:relative;overflow:hidden;transition:background .35s,box-shadow .35s}
+.bento-card:hover{background:rgba(15,26,18,.45);box-shadow:inset 0 3px 0 var(--g),inset 0 0 0 1px rgba(0,197,98,.45)}
+.bento-card.big{grid-column:span 2;grid-row:span 2}
+.bento-card.accent{border-color:var(--border2);background:rgba(0,197,98,.06)}
+.bento-card.accent-o{border-color:rgba(255,92,26,.2);background:rgba(255,92,26,.04)}
+.bento-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,197,98,.5),transparent);opacity:0;transition:opacity .3s}
+.bento-card:hover::before{opacity:1}
+.bento-big-num{font-family:var(--fh);font-size:clamp(4rem,8vw,7rem);color:var(--g);line-height:.9;margin-bottom:.5rem;display:block;transition:font-size .3s ease,text-shadow .3s ease}
+.bento-card:hover .bento-big-num{font-size:clamp(4.5rem,9vw,7.8rem);text-shadow:0 0 32px rgba(0,197,98,.75)}
+.bento-big-num.orange{color:var(--o)}
+.bento-unit{font-size:.55em;color:var(--g2)}
+.bento-unit.ou{color:var(--o2)}
+.bento-card h3{font-size:1rem;font-weight:700;color:white;margin-bottom:.5rem;transition:color .3s}
+.bento-card:hover h3{color:#fff;text-shadow:0 0 18px rgba(255,255,255,.18)}
+.bento-card p{font-size:.875rem;color:var(--muted);line-height:1.75;transition:color .3s}
+.bento-card:hover p{color:var(--text)}
+.bento-card .source{font-size:.68rem;color:var(--dim);margin-top:1rem;font-style:italic}
+.bento-icon{font-size:2rem;margin-bottom:1rem;display:block}
+.bento-highlight{display:inline-block;background:rgba(255,92,26,.12);color:var(--o);font-size:.7rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:.2rem .6rem;border-radius:6px;margin-bottom:.75rem}
+.bento-highlight.green{background:rgba(0,197,98,.12);color:var(--g)}
+
+/* Numbers row */
+.numbers-section{padding:6rem 5vw;background:linear-gradient(135deg,var(--dark3) 0%,var(--dark) 100%);position:relative;overflow:hidden}
+.numbers-section::after{content:'';position:absolute;bottom:-200px;right:-200px;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(0,197,98,.05),transparent 70%)}
+.numbers-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1}
+#earth-globe{position:absolute;right:-210px;top:50%;transform:translateY(-50%);width:720px;height:720px;pointer-events:none;z-index:0;opacity:.58;mix-blend-mode:screen;filter:blur(0.8px)}
+@media(max-width:768px){#earth-globe{width:360px;height:360px;right:-130px;opacity:.35}}
+.numbers-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border-radius:var(--r2);overflow:hidden;border:1px solid var(--border);margin-top:3.5rem}
+.num-item{background:rgba(15,26,18,.82);padding:2.5rem 1.5rem;display:flex;flex-direction:column;gap:.5rem;transition:background .35s,box-shadow .35s}
+.num-item:hover{background:rgba(15,26,18,.45);box-shadow:inset 0 3px 0 var(--g),inset 0 0 0 1px rgba(0,197,98,.45)}
+.num-big{font-family:var(--fh);font-size:3rem;color:var(--g);line-height:1;transition:font-size .3s ease,text-shadow .3s ease}
+.num-item:hover .num-big{font-size:3.8rem;text-shadow:0 0 32px rgba(0,197,98,.75)}
+.num-label{font-size:.83rem;color:var(--muted);line-height:1.5;max-width:160px;transition:color .3s,font-size .3s}
+.num-item:hover .num-label{color:var(--text);font-size:.92rem}
+.num-source{font-size:.65rem;color:var(--dim);margin-top:.25rem}
+
+/* ═══════════════════════════════════════════
+   SOLUTION / PRODUTO
+═══════════════════════════════════════════ */
+.solution-section{padding:8rem 5vw;background:var(--dark2)}
+.sol-inner{max-width:1100px;margin:0 auto}
+.sol-grid{display:grid;grid-template-columns:1fr 1.1fr;gap:6vw;align-items:center}
+.sol-visual{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto;gap:10px}
+.sol-img-wrap{border-radius:var(--r);overflow:hidden;position:relative}
+.sol-img-wrap:first-child{grid-row:span 2;border-radius:var(--r2);border:1.5px solid rgba(255,92,26,.25)}
+.sol-img-wrap{border:1px solid var(--border)}
+.sol-img-wrap img{width:100%;height:100%;object-fit:cover;display:block;filter:brightness(.85) contrast(1.05)}
+.sol-img-wrap:hover img{filter:brightness(.98) contrast(1.05);transition:filter .4s}
+.sol-img-wrap:first-child:hover{border-color:rgba(255,92,26,.5);box-shadow:0 0 32px rgba(255,92,26,.1)}
+.sol-overlay{position:absolute;bottom:0;left:0;right:0;padding:1rem 1.25rem;background:linear-gradient(transparent,rgba(8,13,10,.85))}
+.sol-overlay span{font-size:.75rem;font-weight:600;color:var(--o)}
+.sol-features{display:flex;flex-direction:column;gap:1rem}
+.sf-item{display:flex;gap:1rem;padding:1.25rem 1.5rem;background:var(--glass);border:1px solid var(--border);border-radius:var(--r);transition:border-color .2s,background .2s;cursor:default}
+.sf-item:hover{background:rgba(0,197,98,.05);border-color:var(--border2)}
+.sf-num{font-family:var(--fh);font-size:1.5rem;color:rgba(0,197,98,.2);line-height:1;flex-shrink:0;min-width:2rem;transition:color .2s}
+.sf-item:hover .sf-num{color:var(--g)}
+.sf-item h3{font-size:.92rem;font-weight:700;color:white;margin-bottom:.35rem}
+.sf-item p{font-size:.83rem;color:var(--muted);line-height:1.65}
+.sf-tag{display:inline-block;margin-top:.5rem;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--g);background:rgba(0,197,98,.1);padding:.2rem .55rem;border-radius:4px}
+.sf-tag.hw{color:var(--o);background:rgba(255,92,26,.1)}
+.sf-num.hw{color:rgba(255,92,26,.22)}
+.sf-item:hover .sf-num.hw{color:var(--o)}
+.sf-item.hw-item:hover{background:rgba(255,92,26,.05);border-color:var(--o-border)}
+.sf-item.hw-item:hover .sf-num{color:var(--o)}
+
+/* ═══════════════════════════════════════════
+   TELEREABILITAÇÃO
+═══════════════════════════════════════════ */
+.telereab-section{padding:8rem 5vw;background:var(--dark2)}
+.telereab-inner{max-width:1100px;margin:0 auto;text-align:left}
+.telereab-carousel{position:relative;height:320px;margin-top:1.5rem;border-radius:var(--r2);overflow:hidden;background:transparent;max-width:560px}
+.carousel-slide{position:absolute;inset:0;opacity:0;animation:tc-fade 9s ease-in-out infinite;display:flex;align-items:center;justify-content:center}
+.carousel-slide:nth-child(1){animation-delay:0s}
+.carousel-slide:nth-child(2){animation-delay:3s}
+.carousel-slide:nth-child(3){animation-delay:6s}
+.carousel-slide img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+@keyframes tc-fade{
+  0%{opacity:0}5%{opacity:1}31%{opacity:1}37%{opacity:0}100%{opacity:0}
+}
+.carousel-dots{display:flex;gap:8px;margin-top:1rem;justify-content:flex-start;max-width:560px}
+.c-dot{height:3px;width:24px;border-radius:2px;background:rgba(255,255,255,.12);animation:dot-pulse 9s infinite}
+.c-dot:nth-child(1){animation-delay:0s}
+.c-dot:nth-child(2){animation-delay:3s}
+.c-dot:nth-child(3){animation-delay:6s}
+@keyframes dot-pulse{
+  0%,4%{background:rgba(255,255,255,.12)}5%{background:var(--g)}31%{background:var(--g)}37%{background:rgba(255,255,255,.12)}100%{background:rgba(255,255,255,.12)}
+}
+.telereab-desc{display:flex;flex-direction:column;gap:.65rem;margin-top:1.75rem;max-width:640px;text-align:left}
+.telereab-desc p{font-size:.9rem;color:var(--muted);line-height:1.8;padding-left:1rem;border-left:2px solid var(--border2)}
+@media(max-width:768px){.telereab-carousel{height:220px;max-width:100%}}
+
+/* ═══════════════════════════════════════════
+   HOW IT WORKS
+═══════════════════════════════════════════ */
+.how-section{padding:8rem 5vw;background:var(--dark)}
+.how-inner{max-width:1100px;margin:0 auto}
+.how-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;margin-top:3.5rem}
+.how-step{padding:2.5rem 2rem;border-right:1px solid var(--border);background:var(--dark2);position:relative;transition:background .2s}
+.how-step:last-child{border-right:none}
+.how-step:hover{background:var(--dark3)}
+.step-n{font-family:var(--fh);font-size:5rem;color:rgba(0,197,98,.06);line-height:1;position:absolute;top:1.5rem;right:1.75rem}
+.how-step-icon{width:48px;height:48px;border-radius:12px;background:var(--gray3);border:1px solid var(--gray2);display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:1.5rem;transition:background .3s,border-color .3s}
+.how-step:hover .how-step-icon{background:rgba(255,92,26,.1);border-color:var(--o-border)}
+.how-step h3{font-size:1rem;font-weight:700;color:white;margin-bottom:.6rem}
+.how-step p{font-size:.855rem;color:var(--muted);line-height:1.7}
+.step-model{margin-top:1.25rem;display:inline-flex;align-items:center;gap:6px;font-size:.7rem;font-weight:600;color:var(--o);letter-spacing:.06em;text-transform:uppercase}
+.step-model::before{content:'→'}
+
+/* ═══════════════════════════════════════════
+   VIDEOS
+═══════════════════════════════════════════ */
+.videos-section{padding:8rem 5vw;background:var(--dark2)}
+.videos-inner{max-width:1100px;margin:0 auto}
+.videos-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:3.5rem;align-items:start}
+.vid-wrap{padding-bottom:56.25%;position:relative;height:0;border-radius:var(--r2);overflow:hidden;background:var(--dark3)}
+.vid-wrap-sm{padding-bottom:56.25%;position:relative;height:0;border-radius:var(--r);overflow:hidden;background:var(--dark3)}
+.vid-wrap iframe,.vid-wrap-sm iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0}
+.vid-wrap video,.vid-wrap-sm video{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;cursor:pointer}
+.vid-play-btn{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:64px;height:64px;background:rgba(0,197,98,.95);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.3rem;color:#000;transition:all .2s;box-shadow:0 8px 32px rgba(0,197,98,.4);cursor:pointer;z-index:2}
+.vid-wrap:hover .vid-play-btn,.vid-wrap-sm:hover .vid-play-btn{transform:translate(-50%,-50%) scale(1.1)}
+.vid-info{padding:1.25rem 0 0}
+.vid-info h3{font-size:.95rem;font-weight:700;color:white;margin-bottom:.3rem}
+.vid-info p{font-size:.82rem;color:var(--muted)}
+
+/* ═══════════════════════════════════════════
+   GALLERY (bento)
+═══════════════════════════════════════════ */
+.gallery-section{padding:6rem 5vw;background:var(--dark2)}
+.gallery-inner{max-width:1100px;margin:0 auto}
+.gallery-bento{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:1fr 1fr;height:860px;gap:10px;margin-top:2.5rem}
+.g-cell{border-radius:var(--r);overflow:hidden;position:relative;background:var(--dark3)}
+.g-cell:nth-child(1){grid-column:span 2;grid-row:span 2;border-radius:var(--r2)}
+.g-cell img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s,filter .5s;filter:brightness(.78) saturate(.9)}
+.g-cell:hover img{transform:scale(1.06);filter:brightness(.95) saturate(1.1)}
+.g-label{position:absolute;bottom:0;left:0;right:0;padding:.7rem 1rem;background:linear-gradient(transparent,rgba(8,13,10,.8));font-size:.72rem;font-weight:600;color:var(--g)}
+
+/* ═══════════════════════════════════════════
+   VALIDATION / AUTHORITY
+═══════════════════════════════════════════ */
+.authority-section{padding:8rem 5vw;background:var(--dark)}
+.auth-inner{max-width:1100px;margin:0 auto}
+.auth-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:4rem;margin-top:3.5rem;align-items:start}
+
+/* Congress Table */
+.congress-table-wrap{background:var(--dark2);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;margin-bottom:2rem}
+.ctable{width:100%;border-collapse:collapse}
+.ctable th{background:rgba(0,197,98,.12);color:var(--g);font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.875rem 1.25rem;text-align:left}
+.ctable td{padding:.9rem 1.25rem;border-bottom:1px solid var(--border);font-size:.85rem;color:var(--muted);vertical-align:middle}
+.ctable tr:last-child td{border-bottom:none}
+.ctable tbody tr{transition:background .2s}
+.ctable tbody tr:hover{background:rgba(255,255,255,.02)}
+.ctable td strong{color:var(--text)}
+.cstatus{display:inline-flex;align-items:center;gap:.35rem;font-size:.7rem;font-weight:700;padding:.2rem .65rem;border-radius:100px}
+.cstatus.ok{background:rgba(0,197,98,.12);color:#7ff5b5;border:1px solid rgba(0,197,98,.25)}
+.cstatus.pending{background:rgba(255,255,255,.06);color:var(--dim);border:1px solid rgba(255,255,255,.1)}
+.cflag{display:inline-block;font-size:.65rem;font-weight:700;padding:.15rem .5rem;border-radius:4px}
+.cf-flagship{background:rgba(255,215,0,.15);color:#ffd700}
+.cf-int{background:rgba(0,120,255,.15);color:#7ab4ff}
+.cf-br{background:rgba(0,140,60,.15);color:#7ff5b5}
+
+/* Timeline */
+.timeline{display:flex;flex-direction:column;gap:0;border-left:1px solid var(--border2);padding-left:2rem;margin-left:.5rem}
+.tl-item{position:relative;padding-bottom:1.75rem}
+.tl-item::before{content:'';position:absolute;left:-2.45rem;top:.35rem;width:10px;height:10px;border-radius:50%;background:var(--dark2);border:2px solid var(--border2);transition:border-color .2s,background .2s}
+.tl-item:hover::before{border-color:var(--g);background:var(--g)}
+.tl-year{font-size:.68rem;font-weight:800;letter-spacing:.1em;color:var(--g);text-transform:uppercase;margin-bottom:.3rem}
+.tl-item h4{font-size:.9rem;font-weight:700;color:white;margin-bottom:.2rem}
+.tl-item p{font-size:.815rem;color:var(--muted);line-height:1.6}
+
+/* Sidebar */
+.auth-sidebar{display:flex;flex-direction:column;gap:1rem}
+.award-card{background:var(--dark2);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem 1.5rem;display:flex;align-items:flex-start;gap:.875rem;transition:border-color .2s}
+.award-card:hover{border-color:rgba(255,215,0,.2)}
+.award-em{font-size:1.3rem;flex-shrink:0}
+.award-card h4{font-size:.85rem;font-weight:700;color:white;margin-bottom:.2rem}
+.award-card span{font-size:.75rem;color:var(--muted)}
+.patents-card{background:linear-gradient(135deg,rgba(0,197,98,.08),rgba(0,100,50,.04));border:1px solid var(--border2);border-radius:var(--r);padding:1.5rem}
+.patents-card h4{font-size:.8rem;font-weight:700;color:var(--g);margin-bottom:1rem;letter-spacing:.06em;text-transform:uppercase}
+.patent-line{display:flex;gap:.6rem;align-items:flex-start;margin-bottom:.6rem}
+.patent-line:last-child{margin-bottom:0}
+.pd{width:5px;height:5px;border-radius:50%;background:var(--g);flex-shrink:0;margin-top:.45rem}
+.patent-line p{font-size:.82rem;color:var(--muted);line-height:1.5}
+.ip-logos{display:flex;gap:.875rem;align-items:center;margin-top:1rem;flex-wrap:wrap}
+.ip-logos img{height:22px;width:auto;object-fit:contain;filter:brightness(0) invert(1) opacity(.45);transition:filter .3s}
+.ip-logos img:hover{filter:brightness(0) invert(1) opacity(.9)}
+
+/* ═══════════════════════════════════════════
+   MÍDIA / IMPRENSA
+═══════════════════════════════════════════ */
+.media-section{padding:7rem 5vw;background:var(--dark2)}
+.media-inner{max-width:1100px;margin:0 auto}
+.media-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-top:3.5rem}
+.media-card{background:var(--dark3);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;transition:all .3s}
+.media-card:hover{border-color:var(--border2);transform:translateY(-3px)}
+.media-photo{aspect-ratio:16/9;overflow:hidden;position:relative}
+.media-photo img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s,filter .4s;filter:brightness(.8) saturate(.85)}
+.media-card:hover .media-photo img{transform:scale(1.05);filter:brightness(.95) saturate(1.05)}
+.media-overlay{position:absolute;inset:0;background:linear-gradient(transparent 50%,rgba(8,13,10,.7))}
+.media-body{padding:1.25rem 1.5rem}
+.media-logo{height:24px;width:auto;object-fit:contain;filter:grayscale(1) brightness(2) opacity(.55);margin-bottom:.75rem;transition:filter .3s}
+.media-card:hover .media-logo{filter:grayscale(0) brightness(1) opacity(.95)}
+.media-title{font-size:.92rem;font-weight:700;color:white;margin-bottom:.35rem}
+.media-text{font-size:.8rem;color:var(--muted);line-height:1.65}
+
+/* ═══════════════════════════════════════════
+   ODS / IMPACTO SOCIAL
+═══════════════════════════════════════════ */
+.ods-section{padding:7rem 5vw;background:var(--dark3)}
+.ods-inner{max-width:1100px;margin:0 auto}
+.ods-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-top:3.5rem}
+.ods-card{background:var(--dark2);border:1px solid var(--border);border-radius:var(--r2);padding:2rem 1.75rem;text-align:center;transition:all .3s}
+.ods-card:hover{border-color:var(--border2);transform:translateY(-3px)}
+.ods-card img{height:80px;width:auto;object-fit:contain;margin:0 auto 1.25rem}
+.ods-card h3{font-size:1rem;font-weight:700;color:white;margin-bottom:.75rem}
+.ods-card p{font-size:.855rem;color:var(--muted);line-height:1.7}
+
+/* ═══════════════════════════════════════════
+   SOBRE / ABOUT
+═══════════════════════════════════════════ */
+.about-section{padding:7rem 5vw;background:var(--dark2)}
+.about-inner{max-width:1100px;margin:0 auto}
+.about-grid{display:grid;grid-template-columns:5fr 6fr;gap:5vw;align-items:center}
+.founder-photo{border-radius:var(--r2);overflow:hidden;aspect-ratio:.8;border:1px solid var(--border2);position:relative;background:var(--dark3)}
+.founder-photo img{width:100%;height:100%;object-fit:cover;object-position:top;display:block;filter:brightness(.88) contrast(1.05)}
+.founder-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem;padding:3rem 2rem;text-align:center}
+.founder-initials{width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,var(--g),#007a3d);display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-size:3.5rem;color:#000;box-shadow:0 12px 40px rgba(0,197,98,.35)}
+.founder-badge{position:absolute;bottom:1.5rem;left:1.5rem;right:1.5rem;background:rgba(8,13,10,.88);backdrop-filter:blur(16px);border:1px solid var(--border2);border-radius:var(--r);padding:.875rem 1.1rem}
+.founder-badge strong{font-size:.95rem;font-weight:700;color:white;display:block}
+.founder-badge span{font-size:.78rem;color:var(--g)}
+.about-text .section-h{font-size:clamp(2rem,4vw,3.5rem);margin-bottom:1.25rem}
+.about-text p{font-size:.93rem;color:var(--muted);line-height:1.85;margin-bottom:.875rem}
+.about-chips{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1.75rem}
+.chip{font-size:.72rem;font-weight:600;background:var(--glass);border:1px solid var(--border);color:var(--muted);padding:.3rem .8rem;border-radius:100px;transition:border-color .2s,color .2s}
+.chip:hover{border-color:var(--border2);color:var(--g)}
+.chip.green{background:rgba(0,197,98,.08);border-color:var(--border2);color:var(--g)}
+
+/* ═══════════════════════════════════════════
+   FAQ ACCORDION
+═══════════════════════════════════════════ */
+.faq-section{padding:8rem 5vw;background:var(--dark)}
+.faq-inner{max-width:1100px;margin:0 auto}
+.faq-layout{display:grid;grid-template-columns:1fr 1.5fr;gap:5rem;align-items:start}
+.faq-sticky{position:sticky;top:90px}
+.accordion{display:flex;flex-direction:column;gap:.75rem;margin-top:3.5rem}
+.acc-item{background:var(--dark2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;transition:border-color .3s}
+.acc-item.open{border-color:var(--border2)}
+.acc-trigger{width:100%;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1.25rem 1.5rem;cursor:pointer;font-size:.92rem;font-weight:700;color:var(--text);text-align:left;background:none;border:none;transition:color .2s}
+.acc-trigger:hover{color:var(--g)}
+.acc-icon{width:26px;height:26px;border-radius:50%;background:var(--glass);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;transition:transform .3s,background .3s,border-color .3s;color:var(--muted)}
+.acc-item.open .acc-icon{transform:rotate(45deg);background:var(--g);border-color:var(--g);color:#000}
+.acc-content{max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(.4,0,.2,1)}
+.acc-inner{padding:0 1.5rem 1.25rem;font-size:.9rem;color:var(--muted);line-height:1.75}
+
+/* ═══════════════════════════════════════════
+   LEAD FORM
+═══════════════════════════════════════════ */
+.lead-section{padding:8rem 5vw;position:relative;overflow:hidden;background:var(--dark)}
+.lead-bg{position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,197,98,.09) 0%,var(--dark) 50%,rgba(255,92,26,.05) 100%)}
+.lead-grid-lines{position:absolute;inset:0;opacity:.04;background-image:linear-gradient(rgba(0,197,98,.8) 1px,transparent 1px),linear-gradient(90deg,rgba(0,197,98,.8) 1px,transparent 1px);background-size:60px 60px}
+.lead-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1}
+.lead-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:start}
+.lead-left{padding-top:1rem}
+.lead-value-list{display:flex;flex-direction:column;gap:.875rem;margin:2rem 0 2.5rem}
+.lv-item{display:flex;align-items:flex-start;gap:.75rem;font-size:.92rem;color:var(--muted);line-height:1.5}
+.lv-icon{width:22px;height:22px;border-radius:50%;background:rgba(0,197,98,.12);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:.65rem;color:var(--g);flex-shrink:0;margin-top:1px}
+.lead-alt{display:flex;flex-direction:column;gap:.75rem}
+.lead-alt a{display:inline-flex;align-items:center;gap:.6rem;font-size:.88rem;font-weight:600;color:var(--muted);transition:color .2s}
+.lead-alt a:hover{color:var(--g)}
+.form-card{background:rgba(15,26,18,.88);backdrop-filter:blur(24px);border:1px solid var(--border2);border-radius:var(--r2);padding:2.5rem}
+.form-card h3{font-size:1.1rem;font-weight:800;color:white;margin-bottom:.375rem}
+.form-card p{font-size:.82rem;color:var(--dim);margin-bottom:1.75rem}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:.875rem;margin-bottom:.875rem}
+.form-field{display:flex;flex-direction:column;gap:.4rem}
+.form-field label{font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.09em}
+.form-field input,.form-field select,.form-field textarea{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--fb);font-size:.9rem;padding:.75rem 1rem;outline:none;width:100%;transition:border-color .2s,background .2s}
+.form-field input::placeholder,.form-field textarea::placeholder{color:var(--dim)}
+.form-field input:focus,.form-field select:focus,.form-field textarea:focus{border-color:var(--border2);background:rgba(0,197,98,.03)}
+.form-field select{cursor:pointer;appearance:none}
+.form-field textarea{resize:vertical;min-height:90px}
+.form-full{grid-column:span 2}
+.form-radio-group{display:flex;flex-direction:column;gap:.5rem}
+.form-radio{display:flex;align-items:center;gap:.75rem;padding:.625rem 1rem;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:all .2s}
+.form-radio:has(input:checked){background:rgba(0,197,98,.08);border-color:var(--border2)}
+.form-radio:hover{background:rgba(255,255,255,.07)}
+.form-radio input[type="radio"]{accent-color:var(--g);width:15px;height:15px;flex-shrink:0}
+.form-radio-label{font-size:.855rem;font-weight:500;color:var(--muted)}
+.form-submit{width:100%;margin-top:1rem;background:var(--g);color:#000;font-family:var(--fb);font-weight:800;font-size:1rem;padding:1rem;border-radius:100px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .2s,transform .15s,box-shadow .2s}
+.form-submit:hover{background:var(--g2);transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,197,98,.3)}
+.form-note{font-size:.72rem;color:var(--dim);text-align:center;margin-top:.875rem}
+#form-status{display:none;margin-top:.875rem;padding:.875rem 1.25rem;border-radius:8px;font-size:.875rem}
+
+/* ═══════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════ */
+footer{background:#050b07;padding:5rem 5vw 2.5rem;border-top:1px solid var(--border)}
+.footer-inner{max-width:1100px;margin:0 auto}
+.footer-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem;padding-bottom:3rem;border-bottom:1px solid var(--border);margin-bottom:2.5rem}
+.footer-brand .logo-text{font-size:1.1rem;margin-bottom:.875rem}
+.footer-brand p{font-size:.82rem;color:var(--dim);line-height:1.75;max-width:260px}
+.footer-badges{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1.25rem}
+.fb{font-size:.65rem;font-weight:800;padding:.25rem .6rem;border-radius:4px;letter-spacing:.05em}
+.fb-g{background:rgba(0,100,60,.5);color:#7ff5b5}
+.fb-b{background:rgba(0,60,160,.5);color:#7ab4ff}
+.fb-r{background:rgba(190,100,0,.5);color:#ffba4d}
+.fb-o{background:rgba(150,50,0,.5);color:#ffb080}
+.footer-col h4{font-size:.7rem;font-weight:800;color:var(--dim);text-transform:uppercase;letter-spacing:.12em;margin-bottom:1rem}
+.footer-col a{display:block;font-size:.84rem;color:rgba(232,240,235,.35);text-decoration:none;margin-bottom:.5rem;transition:color .2s}
+.footer-col a:hover{color:var(--g)}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.875rem}
+.footer-bottom p{font-size:.75rem;color:var(--dim)}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════ */
+@media(max-width:1024px){
+  .hero-inner,.sol-grid,.auth-grid,.about-grid,.lead-grid,.faq-layout{grid-template-columns:1fr}
+  .hero-video-side{display:none}
+  .pain-bento{grid-template-columns:1fr}.bento-card.big{grid-column:1;grid-row:1}
+  .how-steps{grid-template-columns:1fr}.how-step{border-right:none;border-bottom:1px solid var(--border)}
+  .numbers-row{grid-template-columns:1fr 1fr}
+  .gallery-bento{grid-template-columns:repeat(2,1fr);grid-template-rows:250px 250px 250px 250px}
+  .g-cell:nth-child(1){grid-column:span 2;grid-row:span 2}
+  .footer-top{grid-template-columns:1fr 1fr}
+  .nav-pill a.nav-link-item{display:none}
+  .form-row{grid-template-columns:1fr}.form-full{grid-column:1}
+  .media-grid{grid-template-columns:1fr 1fr}
+  .ods-grid{grid-template-columns:1fr 1fr}
+  .faq-sticky{position:relative;top:auto}
+  .hamburger{display:flex}
+}
+@media(max-width:640px){
+  .videos-grid{grid-template-columns:1fr}
+  .hero{padding-top:80px}
+  .hero h1{font-size:clamp(3rem,10vw,4.5rem)}
+  .hero-pain{grid-template-columns:1fr;gap:1px}
+  .numbers-row{grid-template-columns:1fr}
+  .media-grid{grid-template-columns:1fr}
+  .ods-grid{grid-template-columns:1fr}
+  .gallery-bento{grid-template-columns:1fr 1fr;grid-template-rows:180px 180px 180px 180px}
+  .footer-top{grid-template-columns:1fr}
+  .ctable{font-size:.78rem}
+  .ctable th,.ctable td{padding:.625rem .875rem}
+  .hero-btns{flex-direction:column}
+  .hero-btns a{width:100%;justify-content:center}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ═══════════════════════════════════════════
+   HERO VIDEO BG + OVERLAY
+═══════════════════════════════════════════ */
+.hero-video-bg{position:absolute;inset:0;z-index:0;overflow:hidden}
+.hero-video-bg video{width:100%;height:100%;object-fit:cover;display:block;opacity:.80}
+.hero-video-overlay{
+  position:absolute;inset:0;z-index:1;
+  background:linear-gradient(
+    to bottom,
+    rgba(8,13,10,.92) 0%,
+    rgba(8,13,10,.82) 18%,
+    rgba(8,13,10,.55) 36%,
+    rgba(8,13,10,.38) 54%,
+    rgba(8,13,10,.50) 72%,
+    rgba(8,13,10,.72) 88%,
+    rgba(8,13,10,.85) 100%
+  )
+}
+.hero .hero-glow,.hero .hero-glow-o,.hero .hero-grid-lines{z-index:2}
+
+/* ═══════════════════════════════════════════
+   HERO CAROUSEL
+═══════════════════════════════════════════ */
+.hero-carousel{display:grid;grid-template-areas:"slide";margin-bottom:1.5rem}
+.hero-slide{grid-area:slide;opacity:0;transition:opacity .85s ease;pointer-events:none}
+.hero-slide.active{opacity:1;pointer-events:auto}
+.hero-carousel-dots{display:flex;gap:10px;margin-bottom:2rem;align-items:center}
+.carousel-dot{height:4px;border-radius:2px;border:none;cursor:pointer;padding:0;background:rgba(255,255,255,.2);width:28px;transition:background .3s,width .3s}
+.carousel-dot.active{background:var(--g);width:44px}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ NAV ═══════════ -->
+<nav id="nav">
+  <a href="#hero" class="nav-logo">
+    <img src="_knowledge/identidade-visual/FisioAtual1.png" alt="Fisioatual" style="height:42px;width:auto">
+  </a>
+  <div class="nav-pill">
+    <a href="#solucao" class="nav-link-item">Solução</a>
+    <a href="#validacao" class="nav-link-item">Validação</a>
+    <a href="#midia" class="nav-link-item">Mídia</a>
+    <a href="#sobre" class="nav-link-item">Sobre</a>
+  </div>
+  <button class="hamburger" id="burger" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+
+<!-- Mobile menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#solucao">Solução</a>
+  <a href="#validacao">Validação</a>
+  <a href="#midia">Mídia</a>
+  <a href="#sobre">Sobre</a>
+</div>
+
+
+<!-- ═══════════ HERO ═══════════ -->
+<section class="hero" id="hero">
+  <!-- Video background -->
+  <div class="hero-video-bg">
+    <video autoplay muted loop playsinline preload="metadata">
+      <source src="_knowledge/videos/Mídia_demo.mp4" type="video/mp4">
+    </video>
+  </div>
+  <!-- Gradient: dark top (logo area) → lighter middle (video visible) → dark bottom -->
+  <div class="hero-video-overlay"></div>
+
+  <div class="hero-glow"></div>
+  <div class="hero-glow-o"></div>
+  <div class="hero-grid-lines"></div>
+
+  <div class="hero-inner">
+    <div class="hero-left">
+
+      <!-- Carousel: alterna entre os dois textos -->
+      <div class="hero-carousel">
+        <!-- Slide 1 -->
+        <div class="hero-slide active">
+          <h1>
+            <span class="thin">O futuro da</span>
+            NEURO<span class="accent">REABILI</span>TAÇÃO
+          </h1>
+          <p class="hero-sub">
+            Simulador robótico + <strong>streaming de games em RV</strong> — a plataforma que transforma sessões clínicas repetitivas em experiências imersivas, engajantes e clinicamente validadas em congressos mundiais.
+          </p>
+        </div>
+        <!-- Slide 2 -->
+        <div class="hero-slide">
+          <h1>
+            <span class="thin">Reabilitação robótica com realidade virtual</span>
+            AO ALCANCE <span class="accent">DE TODOS</span>
+          </h1>
+          <p class="hero-sub">
+            Simulador robótico de baixo custo + <strong>streaming de games terapêuticos e experiências imersivas</strong> democratizando acesso à tecnologia de robótica assistiva de alto padrão. Tecnologia 100% nacional.
+          </p>
+        </div>
+      </div>
+
+      <!-- Indicadores de slide -->
+      <div class="hero-carousel-dots">
+        <button class="carousel-dot active" data-slide="0" aria-label="Slide 1"></button>
+        <button class="carousel-dot" data-slide="1" aria-label="Slide 2"></button>
+      </div>
+
+      <div class="hero-pain">
+        <div class="pain-item">
+          <span class="pain-num">17M</span>
+          <span class="pain-label">brasileiros com deficiência física ou neuromotora</span>
+        </div>
+        <div class="pain-item">
+          <span class="pain-num">45%</span>
+          <span class="pain-label">dos pacientes abandona o tratamento por desmotivação</span>
+        </div>
+        <div class="pain-item">
+          <span class="pain-num">$25B</span>
+          <span class="pain-label">mercado global de reabilitação robótica até 2030</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════ MARQUEE DE LOGOS ═══════════ -->
+<div class="marquee-section">
+  <p class="marquee-label">reconhecimento e validações</p>
+  <div style="display:flex;overflow:hidden;mask-image:linear-gradient(90deg,transparent,black 6%,black 94%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,black 6%,black 94%,transparent)">
+    <div class="marquee-track" style="animation-duration:54s">
+      <!-- Logos — set 1 -->
+      <div class="mq-logo"><img src="_knowledge/logos/Logo-USP-300x161-removebg-preview.png" alt="USP" loading="lazy"><span>Univ. São Paulo</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/LogoUFSCar.png" alt="UFSCar" loading="lazy" style="height:52px;max-width:160px"><span>UFSCar</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/logo HC.png" alt="Hospital das Clínicas" loading="lazy"><span>Hosp. Clínicas FMUSP</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/DNAUSP).png" alt="DNA USP" loading="lazy"><span>DNA USP</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/INPI.png" alt="INPI" loading="lazy"><span>INPI · Patentes</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/WIPO-Logo-470x189.png" alt="WIPO" loading="lazy" style="height:52px;max-width:160px"><span>WIPO</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/tokyo_2025.png" alt="World Physiotherapy Congress 2025 Tokyo" loading="lazy" style="height:52px;max-width:160px;mix-blend-mode:multiply"></div>
+      <div class="mq-logo"><img src="_knowledge/logos/logo_APAE.png" alt="APAE" loading="lazy" style="height:52px;max-width:160px"><span>APAE</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/Logo HB.png" alt="Logo HB" loading="lazy" style="height:52px;max-width:160px;mix-blend-mode:screen"><span>HB</span></div>
+
+      <div class="mq-logo"><img src="_knowledge/logos/banner-evento.png" alt="Evento" loading="lazy" style="height:44px;max-width:140px"><span>Evento</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/X-reality.png" alt="X Reality" loading="lazy" style="height:44px;max-width:140px"><span>X Reality</span></div>
+
+      <div class="mq-logo"><img src="_knowledge/logos/VR week.png" alt="VR Week" loading="lazy" style="height:44px;max-width:140px"><span>VR Week</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/Globonews_logo.png" alt="GloboNews" loading="lazy"><span>GloboNews</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/logo_record.png" alt="Rede Record" loading="lazy" style="height:36px;max-width:120px"><span>Rede Record</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/logo folha.png" alt="Folha de S.Paulo" loading="lazy"><span>Folha de S.Paulo</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/campuspartybrasil2014logo.png" alt="Campus Party Brasil" loading="lazy"><span>Campus Party</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/NTT).png" alt="NTT Data" loading="lazy" style="height:52px;max-width:160px"><span>NTT Data</span></div>
+      <!-- Logos — set 2 (duplicata para loop contínuo) -->
+      <div class="mq-logo"><img src="_knowledge/logos/Logo-USP-300x161-removebg-preview.png" alt="USP" loading="lazy"><span>Univ. São Paulo</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/LogoUFSCar.png" alt="UFSCar" loading="lazy" style="height:52px;max-width:160px"><span>UFSCar</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/logo HC.png" alt="Hospital das Clínicas" loading="lazy"><span>Hosp. Clínicas FMUSP</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/DNAUSP).png" alt="DNA USP" loading="lazy"><span>DNA USP</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/INPI.png" alt="INPI" loading="lazy"><span>INPI · Patentes</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/WIPO-Logo-470x189.png" alt="WIPO" loading="lazy" style="height:52px;max-width:160px"><span>WIPO</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/tokyo_2025.png" alt="World Physiotherapy Congress 2025 Tokyo" loading="lazy" style="height:52px;max-width:160px;mix-blend-mode:multiply"></div>
+      <div class="mq-logo"><img src="_knowledge/logos/logo_APAE.png" alt="APAE" loading="lazy" style="height:52px;max-width:160px"><span>APAE</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/Logo HB.png" alt="Logo HB" loading="lazy" style="height:52px;max-width:160px;mix-blend-mode:screen"><span>HB</span></div>
+
+      <div class="mq-logo"><img src="_knowledge/logos/banner-evento.png" alt="Evento" loading="lazy" style="height:44px;max-width:140px"><span>Evento</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/X-reality.png" alt="X Reality" loading="lazy" style="height:44px;max-width:140px"><span>X Reality</span></div>
+
+      <div class="mq-logo"><img src="_knowledge/logos/VR week.png" alt="VR Week" loading="lazy" style="height:44px;max-width:140px"><span>VR Week</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/Globonews_logo.png" alt="GloboNews" loading="lazy"><span>GloboNews</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/logo_record.png" alt="Rede Record" loading="lazy" style="height:36px;max-width:120px"><span>Rede Record</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/logo folha.png" alt="Folha de S.Paulo" loading="lazy"><span>Folha de S.Paulo</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/campuspartybrasil2014logo.png" alt="Campus Party Brasil" loading="lazy"><span>Campus Party</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/NTT).png" alt="NTT Data" loading="lazy" style="height:52px;max-width:160px"><span>NTT Data</span></div>
+    </div>
+  </div>
+  <!-- Segunda linha — sentido inverso -->
+  <div style="display:flex;overflow:hidden;margin-top:.75rem;mask-image:linear-gradient(90deg,transparent,black 6%,black 94%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,black 6%,black 94%,transparent)">
+    <div class="marquee-track-r" style="animation-duration:48s">
+      <!-- set 1 -->
+      <div class="mq-logo"><img src="_knowledge/logos/physio-logo.png" alt="World Physiotherapy" loading="lazy" style="height:44px;max-width:140px"></div>
+      <div class="mq-logo"><img src="_knowledge/logos/logomakerday.jpg" alt="Maker Day" loading="lazy" style="height:36px;max-width:120px"></div>
+      <div class="mq-logo"><img src="_knowledge/logos/logo-vertical-300x213.png" alt="Parceiro" loading="lazy" style="height:78px;max-width:220px;mix-blend-mode:screen"></div>
+      <div class="mq-logo"><img src="_knowledge/logos/XXV Cong. Bras. Med. Fisica banner.jpg" alt="XXV Congresso Brasileiro de Medicina Física" loading="lazy" style="height:40px;max-width:150px"></div>
+      <div class="mq-logo"><img src="_knowledge/logos/cobrafin.jpeg" alt="COBRAFIN" loading="lazy" style="height:36px;max-width:120px"></div>
+      <div class="mq-logo"><img src="_knowledge/logos/conference_regional.png" alt="Conference Regional" loading="lazy" style="height:44px;max-width:140px"></div>
+      <!-- set 2 (loop) -->
+      <div class="mq-logo"><img src="_knowledge/logos/logo-vertical-300x213.png" alt="Parceiro" loading="lazy" style="height:78px;max-width:220px;mix-blend-mode:screen"></div>
+      <div class="mq-logo"><img src="_knowledge/logos/physio-logo.png" alt="World Physiotherapy" loading="lazy" style="height:44px;max-width:140px"></div>
+      <div class="mq-logo"><img src="_knowledge/logos/logomakerday.jpg" alt="Maker Day" loading="lazy" style="height:36px;max-width:120px"></div>
+      <div class="mq-logo"><img src="_knowledge/logos/XXV Cong. Bras. Med. Fisica banner.jpg" alt="XXV Congresso Brasileiro de Medicina Física" loading="lazy" style="height:40px;max-width:150px"></div>
+      <div class="mq-logo"><img src="_knowledge/logos/cobrafin.jpeg" alt="COBRAFIN" loading="lazy" style="height:36px;max-width:120px"></div>
+      <div class="mq-logo"><img src="_knowledge/logos/conference_regional.png" alt="Conference Regional" loading="lazy" style="height:44px;max-width:140px"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════ LOGOS INSTITUCIONAIS ═══════════ -->
+<div class="logos-section">
+  <p class="logos-section-label">Fomento · Parceiros científicos · Acelerações</p>
+  <div class="logos-grid">
+    <div class="inst-logo"><img src="_knowledge/logos/logo fapesp.png" alt="FAPESP"><span>FAPESP · PIPE</span></div>
+    <div class="inst-logo"><img src="_knowledge/logos/Logo-USP-300x161-removebg-preview.png" alt="USP"><span>Univ. São Paulo</span></div>
+    <div class="inst-logo lg"><img src="_knowledge/logos/LogoUFSCar.png" alt="UFSCar"><span>UFSCar</span></div>
+    <div class="inst-logo"><img src="_knowledge/logos/logo HC.png" alt="Hospital das Clínicas"><span>Hosp. das Clínicas</span></div>
+    <div class="inst-logo lg"><img src="_knowledge/logos/logo_LEFIGE-removebg-preview.png" alt="LEFIGE · FMUSP"><span>LEFIGE · FMUSP</span></div>
+    <div class="inst-logo"><img src="_knowledge/logos/LOGO_medusp.png" alt="Medicina USP"><span>Medicina USP</span></div>
+    <div class="inst-logo"><img src="_knowledge/logos/i-corps.png" alt="I-Corps"><span>I-Corps</span></div>
+    <div class="inst-logo lg"><img src="_knowledge/logos/LIETEC UFSCar.png" alt="LIETEC UFSCar"><span>LIETEC · UFSCar</span></div>
+    <div class="inst-logo lg"><img src="_knowledge/logos/logo_harena.png" alt="Harena"><span>Harena</span></div>
+    <div class="inst-logo"><img src="_knowledge/logos/health.png" alt="Health Innovation"><span>Health Innovation</span></div>
+    <div class="inst-logo"><img src="_knowledge/logos/abstartup.png" alt="ABStartups"><span>ABStartups</span></div>
+    <div class="inst-logo"><img src="_knowledge/logos/Logo HB.png" alt="HB"><span>HB</span></div>
+    <div class="inst-logo lg"><img src="_knowledge/logos/auspin.png" alt="AUSPIN"><span>AUSPIN</span></div>
+    <div class="inst-logo"><img src="_knowledge/logos/logo_ISVR.png" alt="ISVR"><span>ISVR</span></div>
+    <div class="inst-logo"><img src="_knowledge/logos/DNAUSP).png" alt="DNA USP"><span>DNA USP</span></div>
+    <div class="inst-logo"><img src="_knowledge/logos/logo-pipe-m23_u7_16112020180056.png" alt="FAPESP PIPE"><span>PIPE FAPESP</span></div>
+  </div>
+</div>
+
+
+<!-- ═══════════ DOR DO MERCADO ═══════════ -->
+<section class="pain-section" id="dor">
+  <div class="pain-inner">
+    <div class="section-tag">O problema que resolvemos</div>
+    <h2 class="section-h reveal">
+      <span class="light">A reabilitação neurológica é</span>
+      MOROSA
+    </h2>
+    <p class="section-p reveal reveal-delay-1">Pacientes neurológicos precisam de milhares de repetições para recuperar função motora. O modelo atual é demorado, tedioso e desmotivante para a grande maioria. <strong>Nós mudamos isso.</strong></p>
+
+    <div class="pain-bento">
+      <div class="bento-card big accent reveal">
+        <div class="bento-highlight" style="background:rgba(255,92,26,.12);color:var(--o)">⚠ Crise de engajamento</div>
+        <span class="bento-big-num">45<span class="bento-unit">%</span></span>
+        <h3>dos pacientes abandona o tratamento antes de concluir</h3>
+        <p>A reabilitação neurológica exige protocolos prolongados com movimentos repetitivos. Sem engajamento, a adesão colapsa — e os resultados clínicos vão junto. A Fisioatual resolve exatamente isso através de gamificação terapêutica e experiências imersivas que impactam e fidelizam o paciente.</p>
+        <p class="source">Fonte: Serviço público</p>
+      </div>
+      <div class="bento-card reveal reveal-delay-1">
+        <img src="_knowledge/logos/botreab1.png" alt="Robótica assistiva" class="bento-icon" style="height:48px;width:auto">
+        <h3>Escassez de robótica no Brasil</h3>
+        <p>Equipamentos importados e caros, restritos a grandes centros. A Fisioatual entrega tecnologia equivalente em fração do custo, via modelo de assinatura (hardware + SaaS).</p>
+      </div>
+      <div class="bento-card reveal reveal-delay-2">
+        <span class="bento-icon">👶</span>
+        <h3>Geração de nativos digitais</h3>
+        <p>Crianças com deficiências neuromotoras e adultos jovens pós AVC já esperam por novas tecnologias imersivas e engajadoras — não exercícios manuais monótonos.</p>
+      </div>
+      <div class="bento-card reveal reveal-delay-1">
+        <span class="bento-icon">📉</span>
+        <h3>Profissionais sobrecarregados</h3>
+        <p>Fisioterapeutas desperdiçam energia física em movimentos passivos e repetitivos que um simulador pode automatizar — liberando-os para a decisão clínica.</p>
+      </div>
+      <div class="bento-card reveal reveal-delay-2">
+        <span class="bento-icon">🌎</span>
+        <h3>Envelhecimento global acelerado</h3>
+        <p>Japão, Europa e Brasil já sentem a pressão. A demanda por reabilitação cresce mais rápido que a capacidade de resposta dos sistemas de saúde.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════ NÚMEROS DO MERCADO ═══════════ -->
+<section class="numbers-section">
+  <img id="earth-globe" src="_knowledge/videos/gif-earth-slow.gif" alt="">
+  <div class="numbers-inner">
+    <div class="section-tag">Tamanho do mercado</div>
+    <h2 class="section-h reveal">
+      <span class="light">Uma oportunidade global de</span>
+      ESCALA BILIONÁRIA
+    </h2>
+    <div class="numbers-row reveal reveal-delay-1">
+      <div class="num-item">
+        <span class="num-big">2,4B</span>
+        <p class="num-label">pessoas no mundo precisam de serviços de reabilitação</p>
+        <span class="num-source">OMS, 2023</span>
+      </div>
+      <div class="num-item">
+        <span class="num-big">17M</span>
+        <p class="num-label">brasileiros com alguma deficiência física ou neuromotora</p>
+        <span class="num-source">IBGE, Censo 2022</span>
+      </div>
+      <div class="num-item">
+        <span class="num-big">$25B</span>
+        <p class="num-label">mercado global de reabilitação robótica projetado para 2030</p>
+        <span class="num-source">Allied Market Research</span>
+      </div>
+      <div class="num-item">
+        <span class="num-big">68%</span>
+        <p class="num-label">das clínicas de neuroreabilitação carecem de equipamentos tecnológicos no Brasil</p>
+        <span class="num-source">COFITTO, 2022</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════ SOLUÇÃO / PRODUTO ═══════════ -->
+<section class="solution-section" id="solucao">
+  <div class="sol-inner">
+    <div class="section-tag">A plataforma</div>
+    <h2 class="section-h reveal">
+      <span class="light">Hardware + SaaS que transforma a</span>
+      CLÍNICA DO FUTURO
+    </h2>
+    <div class="sol-grid" style="margin-top:3.5rem">
+      <div class="sol-visual reveal">
+        <div class="sol-img-wrap">
+          <img src="_knowledge/fotos/produto/Equo_LETEFE.png" alt="Simulador robótico funcional" loading="lazy">
+          <div class="sol-overlay"><span>▶ Simulador robótico funcional</span></div>
+        </div>
+        <div class="sol-img-wrap">
+          <img src="_knowledge/fotos/produto/APAE_emerson.png" alt="Paciente em sessão com simulador robótico e VR" loading="lazy">
+          <div class="sol-overlay"><span>Games terapêuticos em RV</span></div>
+        </div>
+        <div class="sol-img-wrap">
+          <img src="_knowledge/fotos/produto/20230824_125510.jpg" alt="Sessão clínica com simulador" loading="lazy">
+          <div class="sol-overlay"><span>Validado em clínica</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="sol-features reveal reveal-delay-1">
+          <div class="sf-item hw-item">
+            <span class="sf-num hw">01</span>
+            <div>
+              <h3>Simulador Robótico Funcional</h3>
+              <p>Plataforma com sensores, atuadores robóticos e suspensão do paciente, que garantem segurança na reprodução de movimentos terapêuticos: equilíbrio, marcha, controle de tronco, propriocepção. Custo acessível para clínicas nacionais.</p>
+              <span class="sf-tag hw">Hardware · Tecnologia proprietária</span>
+            </div>
+          </div>
+          <div class="sf-item">
+            <span class="sf-num">02</span>
+            <div>
+              <h3>Games Terapêuticos em RV</h3>
+              <p>+10 games desenvolvidos exclusivamente para reabilitação. O paciente joga — e reabilita. Engajamento transformado em desfecho clínico mensurável.</p>
+              <span class="sf-tag">Software · Conteúdo proprietário</span>
+            </div>
+          </div>
+          <div class="sf-item">
+            <span class="sf-num">03</span>
+            <div>
+              <h3>Streaming SaaS — "Netflix da Reabilitação"</h3>
+              <p>Plataforma de assinatura recorrente: games, experiências 360° imersivas, prontuário com IA e protocolos clínicos atualizados continuamente. Receita previsível e escalável.</p>
+              <span class="sf-tag">SaaS · Receita recorrente</span>
+            </div>
+          </div>
+          <div class="sf-item hw-item">
+            <span class="sf-num hw">04</span>
+            <div>
+              <h3>Dispositivos de uso Domiciliar — Telereabilitação</h3>
+              <p>Versão compacta e portátil com características similares de movimento da versão clínica. Continuidade do tratamento em casa com supervisão remota — modelo B2B2C de alta escalabilidade.</p>
+              <span class="sf-tag hw">Hardware · Telereabilitação</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════ COMO FUNCIONA ═══════════ -->
+<section class="how-section">
+  <div class="how-inner">
+    <div class="section-tag">Modelo de negócio</div>
+    <h2 class="section-h reveal">
+      <span class="light">Da clínica ao domicílio,</span>
+      SEM INTERRUPÇÃO
+    </h2>
+    <div class="how-steps reveal reveal-delay-1">
+      <div class="how-step">
+        <span class="step-n">01</span>
+        <div class="how-step-icon">🏥</div>
+        <h3>Clínica assina a plataforma</h3>
+        <p>Simulador robótico + assinatura SaaS de conteúdo de jogos e experiências imersivas. Setup fácil e intuitivo - "Plug´n Play". Revenue previsível para a Fisioatual e custo fixo acessível para a clínica.</p>
+        <div class="step-model">Modelo B2B</div>
+      </div>
+      <div class="how-step">
+        <span class="step-n">02</span>
+        <div class="how-step-icon"><img src="_knowledge/logos/RV_logo.png" alt="Realidade Virtual" style="height:48px;width:auto"></div>
+        <h3>Sessão clínica imersiva</h3>
+        <p>O fisioterapeuta seleciona o protocolo. O paciente joga em RV ou em tela, ou o simulador reproduz movimentos terapêuticos de acordo com as atividades que o paciente vê nos óculos de Realidade virtual. Engajamento e resultado clínico real.</p>
+        <div class="step-model">Gamificação clínica</div>
+      </div>
+      <div class="how-step">
+        <span class="step-n">03</span>
+        <div class="how-step-icon">🏠</div>
+        <h3>Continua em casa</h3>
+        <p>Dispositivo domiciliar + telereabilitação supervisionada maximizam adesão. Paciente engajado = clínica diferenciada = modelo escalável para franquias e hospitais.</p>
+        <div class="step-model">B2B2C · Domiciliar</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════ TELEREABILITAÇÃO ═══════════ -->
+<section class="telereab-section" id="telereabilitacao">
+  <div class="telereab-inner">
+    <div class="section-tag">Continuidade do tratamento</div>
+    <h2 class="section-h reveal">
+      <span class="light">vários DISPOSITIVOS e um único SaaS de</span>
+      <span style="color:var(--g)">CONTEÚDOS</span>
+    </h2>
+    <div class="telereab-carousel reveal reveal-delay-1">
+      <div class="carousel-slide">
+        <img src="_knowledge/fotos/produto/2patente2_t.png" alt="Dispositivo domiciliar — patente 2">
+      </div>
+      <div class="carousel-slide">
+        <img src="_knowledge/fotos/produto/3patente1_t.png" alt="Dispositivo domiciliar — patente 3">
+      </div>
+      <div class="carousel-slide">
+        <img src="_knowledge/fotos/produto/reab_MMSS.png" alt="Reabilitação de membros superiores">
+      </div>
+    </div>
+    <div class="carousel-dots">
+      <div class="c-dot"></div>
+      <div class="c-dot"></div>
+      <div class="c-dot"></div>
+    </div>
+    <div class="telereab-desc reveal reveal-delay-2">
+      <p>Paciente dá continuidade ao tratamento em casa, com o mesmo ecossistema de games e experiências imersivas da clínica.</p>
+      <p>Profissional monitora e orienta o tratamento de forma remota, garantindo adesão e evolução clínica contínua.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════ UM POUCO SOBRE NÓS ═══════════ -->
+<section style="padding:5rem 5vw;background:var(--dark2);border-top:1px solid var(--border)">
+  <div style="max-width:1100px;margin:0 auto">
+    <div class="section-tag">Um pouco sobre nós</div>
+    <h2 class="section-h reveal">
+      <span class="light">Podcast</span>
+      INCLUSÃO
+      <span class="light" style="display:block;font-size:.42em;margin-top:.2rem">eis a questão</span>
+    </h2>
+    <p class="section-p reveal reveal-delay-1">
+      a história por trás da Fisioatual — tecnologia, propósito e o impacto social da reabilitação robótica na vida de pessoas com deficiência.
+    </p>
+    <div class="reveal reveal-delay-2" style="max-width:580px">
+      <a href="https://youtu.be/Qvqxu9zb_aU" target="_blank" rel="noopener noreferrer"
+         style="display:block;position:relative;border-radius:var(--r2);overflow:hidden;border:1px solid var(--border2);box-shadow:0 8px 40px rgba(0,0,0,.5);text-decoration:none">
+        <img src="https://img.youtube.com/vi/Qvqxu9zb_aU/hqdefault.jpg"
+             alt="Podcast INCLUSÃO eis a questão — Fisioatual"
+             loading="lazy"
+             style="width:100%;display:block;aspect-ratio:16/9;object-fit:cover">
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.35);gap:.75rem">
+          <div style="width:64px;height:64px;background:var(--o);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;padding-left:5px;box-shadow:0 4px 20px rgba(255,92,26,.5)">▶</div>
+          <span style="font-size:.75rem;font-weight:700;letter-spacing:.08em;color:rgba(255,255,255,.85);text-transform:uppercase">Assistir no YouTube</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════ VÍDEOS ═══════════ -->
+<section class="videos-section" id="videos">
+  <div class="videos-inner">
+    <div class="section-tag">Veja funcionando</div>
+    <h2 class="section-h reveal">
+      <span class="light">Não é conceito —</span>
+      É REAL
+    </h2>
+    <div class="videos-grid reveal reveal-delay-1">
+      <div class="vid-main">
+        <div class="vid-wrap" style="cursor:pointer;padding-bottom:177.78%">
+          <video preload="none" poster="_knowledge/fotos/produto/cabeçalho_semi.jpg" id="mainVid">
+            <source src="_knowledge/videos/em_clínica.mp4" type="video/mp4">
+          </video>
+          <div class="vid-play-btn" id="mainPlayBtn">▶</div>
+        </div>
+        <div class="vid-info">
+          <h3>Simulador como controle de games em realidade virtual</h3>
+          <p>Pacientes em sessões reais de treino de marcha e equilíbrio</p>
+        </div>
+      </div>
+      <div class="vid-main">
+        <div class="vid-wrap" style="cursor:pointer;padding-bottom:177.78%">
+          <video preload="none" poster="_knowledge/fotos/produto/APAE37 - Copia.jpg" id="coletasVid">
+            <source src="_knowledge/videos/Coletas_som.mp4" type="video/mp4">
+          </video>
+          <div class="vid-play-btn" id="coletasPlayBtn">▶</div>
+        </div>
+        <div class="vid-info">
+          <h3>Coleta de dados clínicos em tempo real</h3>
+          <p>Avaliação funcional integrada ao simulador — dados captados diretamente pelo fisioterapeuta</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════ GALERIA ═══════════ -->
+<section class="gallery-section">
+  <div class="gallery-inner">
+    <div class="section-tag">Em campo</div>
+    <h2 class="section-h reveal"><span class="light">Impacto documentado em</span>MÚLTIPLOS CONTEXTOS</h2>
+    <div class="gallery-bento reveal reveal-delay-1">
+      <div class="g-cell">
+        <img src="_knowledge/fotos/produto/cabeçalho_semi.jpg" alt="Neuroreabilitação infantil — APAE" loading="lazy">
+        <div class="g-label">Neuroreabilitação infantil</div>
+      </div>
+      <div class="g-cell">
+        <img src="_knowledge/fotos/produto/tokyo_2025.png" alt="World Physiotherapy Congress Tokyo 2025" loading="lazy">
+        <div class="g-label">Acadêmico mundial</div>
+      </div>
+      <div class="g-cell">
+        <img src="_knowledge/fotos/produto/CP_11.jpg" alt="Campus Party Brasil" loading="lazy">
+        <div class="g-label">Campus Party Brasil</div>
+      </div>
+      <div class="g-cell">
+        <img src="_knowledge/fotos/produto/matéria_record.jpg" alt="Mídia espontânea nacional" loading="lazy">
+        <div class="g-label">Mídia espontânea Nacional</div>
+      </div>
+      <div class="g-cell">
+        <img src="_knowledge/fotos/produto/SESC RP12.jpg" alt="Semana da Inclusão" loading="lazy">
+        <div class="g-label">Semana da Inclusão</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════ VALIDAÇÃO / AUTORIDADE ═══════════ -->
+<section class="authority-section" id="validacao">
+  <div class="auth-inner">
+    <div class="section-tag">Validação científica</div>
+    <h2 class="section-h reveal">
+      <span class="light">Não é promessa —</span>
+      <span class="light" style="display:inline">É</span> TECNOLOGIA <span class="light" style="display:inline">baseada em</span> EVIDÊNCIA
+    </h2>
+    <p class="section-p reveal reveal-delay-1">Estudo de validação desenvolvido e testado com especialistas do <strong>Hosp. das Clínicas da Fac. Medicina USP</strong>, unidades da <strong>APAE</strong> e <strong>Hosp. de Base</strong> — Aceito e apresentado nos maiores congressos mundiais de Fisioterapia, Neuroreabilitação e Medicina Física.</p>
+
+    <div class="auth-grid">
+      <div class="reveal">
+        <!-- Congress Table -->
+        <div class="congress-table-wrap">
+          <table class="ctable">
+            <thead>
+              <tr>
+                <th>Evento</th>
+                <th>Local</th>
+                <th>Relevância</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:.75rem"><span style="display:inline-flex;background:rgba(8,20,60,.88);border-radius:5px;padding:4px 8px;flex-shrink:0"><img src="_knowledge/logos/tokyo_2025.png" alt="World Physiotherapy Congress 2025" style="height:44px;width:auto;max-width:130px;object-fit:contain;display:block"></span><div><strong>World Physiotherapy Congress 2025</strong><br><span style="font-size:.75rem;color:var(--dim)">Maior evento mundial de fisioterapia</span></div></div></td>
+                <td>Tokyo 🇯🇵<br><span style="font-size:.72rem;color:var(--dim)">Mai 2025</span></td>
+                <td><span class="cflag cf-flagship">🌟 Flagship</span></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:.75rem"><span style="display:inline-flex;background:rgba(255,255,255,.92);border-radius:5px;padding:3px 7px;flex-shrink:0"><img src="_knowledge/logos/banner-evento.png" alt="XV Congresso Internacional de Fisioterapia SBF" style="height:28px;width:auto;max-width:90px;object-fit:contain;display:block"></span><div><strong>XV Congresso Intl. de Fisioterapia – SBF</strong><br><span style="font-size:.75rem;color:var(--dim)">Maior da América Latina — +4.000 part.</span></div></div></td>
+                <td>Fortaleza 🇧🇷<br><span style="font-size:.72rem;color:var(--dim)">Set 2025</span></td>
+                <td><span class="cflag cf-br">🌎 Maior AL</span></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:.75rem"><span style="display:inline-flex;border-radius:5px;overflow:hidden;flex-shrink:0"><img src="_knowledge/logos/dubai.png" alt="13th World Congress Dubai" style="height:44px;width:auto;max-width:130px;object-fit:contain;display:block"></span><div><strong>13th World Congress — Physical Rehab &amp; Sports Med</strong></div></div></td>
+                <td>Dubai 🇦🇪<br><span style="font-size:.72rem;color:var(--dim)">Out 2025</span></td>
+                <td><span class="cflag cf-int">🌐 Internacional</span></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:.75rem"><span style="display:inline-flex;background:rgba(255,255,255,.92);border-radius:5px;padding:3px 7px;flex-shrink:0"><img src="_knowledge/logos/physio-logo.png" alt="PHYSIO-2025 Lisboa" style="height:28px;width:auto;max-width:90px;object-fit:contain;display:block"></span><div><strong>Global Conference on Physiotherapy — PHYSIO-2025</strong></div></div></td>
+                <td>Lisboa 🇵🇹<br><span style="font-size:.72rem;color:var(--dim)">Nov 2025</span></td>
+                <td><span class="cflag cf-int">🌐 Internacional</span></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:.75rem"><span style="display:inline-flex;border-radius:5px;overflow:hidden;flex-shrink:0"><img src="_knowledge/logos/cobrafin.jpeg" alt="VIII COBRAFIN" style="height:28px;width:auto;max-width:90px;object-fit:contain;display:block"></span><div><strong>VIII COBRAFIN</strong><br><span style="font-size:.75rem;color:var(--dim)">Maior congresso de neuroreabilitação do BR</span></div></div></td>
+                <td>São Paulo 🇧🇷<br><span style="font-size:.72rem;color:var(--dim)">Nov 2025</span></td>
+                <td><span class="cflag cf-br">🧠 Neuroreab.</span></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:.75rem"><span style="display:inline-flex;background:rgba(255,255,255,.92);border-radius:5px;padding:3px 7px;flex-shrink:0"><img src="_knowledge/logos/conference_regional.png" alt="World Physiotherapy South America" style="height:28px;width:auto;max-width:90px;object-fit:contain;display:block"></span><div><strong>World Physiotherapy South America Conference</strong></div></div></td>
+                <td>Punta del Este 🇺🇾<br><span style="font-size:.72rem;color:var(--dim)">Abr 2026</span></td>
+                <td><span class="cflag cf-int">🌐 Regional</span></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:.75rem"><span style="display:inline-flex;background:rgba(255,255,255,.92);border-radius:5px;padding:3px 7px;flex-shrink:0"><img src="_knowledge/logos/Congress_USP.png" alt="VII Congresso HC FMUSP" style="height:28px;width:auto;max-width:90px;object-fit:contain;display:block"></span><div><strong>VII Congresso Intl. de Fisioterapia – HC FMUSP</strong></div></div></td>
+                <td>São Paulo 🇧🇷<br><span style="font-size:.72rem;color:var(--dim)">Mai 2026</span></td>
+                <td><span class="cflag cf-br">🏥 Hospitalar</span></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:.75rem"><span style="display:inline-flex;border-radius:5px;overflow:hidden;flex-shrink:0"><img src="_knowledge/logos/XXVII_CBMFR1.jpg" alt="XXVII CBMFR" style="height:54px;width:auto;max-width:140px;object-fit:contain;display:block"></span><div><strong>XXVII Congr. Bras. Medicina Física e Reabilitação – ABMFR</strong></div></div></td>
+                <td>Online 🇧🇷<br><span style="font-size:.72rem;color:var(--dim)">2021</span></td>
+                <td><span class="cflag cf-br">🏥 Nacional</span></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:.75rem"><span style="display:inline-flex;background:rgba(255,255,255,.92);border-radius:5px;padding:3px 7px;flex-shrink:0"><img src="_knowledge/logos/unisinos.png" alt="UNISINOS" style="height:28px;width:auto;max-width:90px;object-fit:contain;display:block"></span><div><strong>Realidade Virtual no Cuidado em Saúde – UNISINOS</strong></div></div></td>
+                <td>RS 🇧🇷<br><span style="font-size:.72rem;color:var(--dim)">2021</span></td>
+                <td><span class="cflag cf-br">🎓 Acadêmico</span></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:.75rem"><span style="display:inline-flex;border-radius:5px;overflow:hidden;flex-shrink:0"><img src="_knowledge/logos/X-reality.png" alt="X-Reality USP" style="height:44px;width:auto;max-width:130px;object-fit:contain;display:block"></span><div><strong>X-Reality USP — Conferência &amp; Mostra</strong></div></div></td>
+                <td>São Paulo 🇧🇷<br><span style="font-size:.72rem;color:var(--dim)">2020</span></td>
+                <td><span class="cflag cf-br">🎓 Acadêmico</span></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:.75rem"><span style="display:inline-flex;border-radius:5px;overflow:hidden;flex-shrink:0"><img src="_knowledge/logos/Semec.jpeg" alt="SEMEC" style="height:44px;width:auto;max-width:130px;object-fit:contain;display:block"></span><div><strong>Semana da Mecânica – SEMEC UFTM</strong></div></div></td>
+                <td>Uberaba 🇧🇷<br><span style="font-size:.72rem;color:var(--dim)">2020</span></td>
+                <td><span class="cflag cf-br">🎓 Acadêmico</span></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:.75rem"><span style="display:inline-flex;background:rgba(255,255,255,.92);border-radius:5px;padding:3px 7px;flex-shrink:0"><img src="_knowledge/logos/logo_famerp_2016_3__3_-removebg-preview.png" alt="FAMERP" style="height:44px;width:auto;max-width:130px;object-fit:contain;display:block"></span><div><strong>I Fórum Ciência, Inovação e Tecnologia em Saúde – FAMERP</strong></div></div></td>
+                <td>S.J. Rio Preto 🇧🇷<br><span style="font-size:.72rem;color:var(--dim)">2018</span></td>
+                <td><span class="cflag cf-br">🏥 Saúde</span></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:.75rem"><span style="display:inline-flex;background:rgba(255,255,255,.92);border-radius:5px;padding:3px 7px;flex-shrink:0"><img src="_knowledge/logos/mackenzie.png" alt="Mackenzie" style="height:28px;width:auto;max-width:90px;object-fit:contain;display:block"></span><div><strong>II Simpósio Intl. de Tecnologia e Recuperação Funcional – Mackenzie</strong></div></div></td>
+                <td>São Paulo 🇧🇷<br><span style="font-size:.72rem;color:var(--dim)">2017</span></td>
+                <td><span class="cflag cf-br">🎓 Acadêmico</span></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:.75rem"><span style="display:inline-flex;border-radius:5px;overflow:hidden;flex-shrink:0"><img src="_knowledge/logos/semanainclusiva.jfif" alt="Semana de Inclusão SESC" style="height:28px;width:auto;max-width:90px;object-fit:contain;display:block"></span><div><strong>Semana de Inclusão – SESC</strong></div></div></td>
+                <td>🇧🇷<br><span style="font-size:.72rem;color:var(--dim)">2017</span></td>
+                <td><span class="cflag cf-br">♿ Inclusão</span></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:.75rem"><span style="display:inline-flex;border-radius:5px;overflow:hidden;flex-shrink:0"><img src="_knowledge/logos/XXV Cong. Bras. Med. Fisica banner.jpg" alt="XXV CBMFR" style="height:28px;width:auto;max-width:90px;object-fit:contain;display:block"></span><div><strong>XXV Congresso Brasileiro de Medicina Física e Reabilitação</strong></div></div></td>
+                <td>São Paulo 🇧🇷<br><span style="font-size:.72rem;color:var(--dim)">2016</span></td>
+                <td><span class="cflag cf-br">🏥 Nacional</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Patents -->
+        <div class="patents-card">
+          <h4>⚙ Propriedade Intelectual — 3 Patentes</h4>
+          <div class="patent-line"><div class="pd"></div><p>Plataforma simuladora robótica para reabilitação neurológica e treinamento de marcha</p></div>
+          <div class="patent-line"><div class="pd"></div><p>Disco rolante domiciliar — dispositivo compacto portátil de baixo custo</p></div>
+          <div class="patent-line"><div class="pd"></div><p>Sistema integrado de RV com atuadores robóticos para experiências imersivas terapêuticas</p></div>
+          <div class="ip-logos">
+            <img src="_knowledge/logos/INPI.png" alt="INPI">
+            <img src="_knowledge/logos/WIPO-Logo-470x189.png" alt="WIPO">
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar Awards -->
+      <div class="reveal reveal-delay-2">
+        <div class="auth-sidebar">
+          <div style="font-size:.7rem;font-weight:700;color:var(--g);letter-spacing:.12em;text-transform:uppercase;padding-bottom:.75rem;border-bottom:1px solid var(--border2)">🏆 Finalista de Vários Prêmios</div>
+          <div class="award-card">
+            <span class="award-em">🏆</span>
+            <div><h4>Prêmio Empreendedor USP 2024</h4><span>Ecossistema de empreendedorismo da Universidade de São Paulo</span></div>
+          </div>
+          <div class="award-card">
+            <span class="award-em">🌍</span>
+            <div><h4>Copa do Mundo de Startups 2023</h4><span>Edição Brasil — finalista</span></div>
+          </div>
+          <div class="award-card">
+            <span class="award-em">🏥</span>
+            <div><h4>Prêmio Empreenda Saúde 2017</h4><span>Hospital Sírio-Libanês · III edição · Finalista</span></div>
+          </div>
+          <div class="award-card">
+            <span class="award-em">🔬</span>
+            <div><h4>I Prêmio Tecnologias de Impacto 2018</h4><span>INPI · Qualcomm · CNPq</span></div>
+          </div>
+          <div class="award-card">
+            <span class="award-em">💡</span>
+            <div><h4>NTT Data Open Innovation 2018</h4><span>Conquest Open Innovation Program</span></div>
+          </div>
+          <div class="award-card">
+            <span class="award-em">🎪</span>
+            <div><h4>Campus Party Brasil</h4><span>Demonstração oficial e reconhecimento em inovação</span></div>
+          </div>
+
+          <!-- FAPESP highlight -->
+          <div style="background:linear-gradient(135deg,rgba(0,197,98,.12),rgba(0,100,50,.06));border:1px solid var(--border2);border-radius:var(--r);padding:1.75rem 1.5rem;text-align:center">
+            <img src="_knowledge/logos/logo fapesp.png" alt="FAPESP" style="height:34px;width:auto;object-fit:contain;margin:0 auto 1.1rem;display:block;filter:brightness(0) invert(1);opacity:.92">
+            <div style="font-size:.8rem;color:var(--muted);line-height:1.75;text-align:left">Atualmente, todas as modalidades de subvenção do PIPE/FAPESP juntas, podem aportar montante da ordem de até <strong style="color:var(--g)">R$&nbsp;3.300.000,00</strong>, em recursos não reembolsáveis (equity&nbsp;free), por startup selecionada.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════ MÍDIA / IMPRENSA ═══════════ -->
+<section class="media-section" id="midia">
+  <div class="media-inner">
+    <div class="section-tag">Na Mídia</div>
+    <h2 class="section-h reveal">
+      <span class="light">A Fisioatual nos</span>
+      PRINCIPAIS VEÍCULOS
+    </h2>
+    <div class="media-grid">
+      <div class="media-card reveal reveal-delay-1">
+        <div class="media-photo">
+          <img src="_knowledge/fotos/produto/Globonews.png" alt="Fisioatual na GloboNews — A tecnologia nas invenções brasileiras" loading="lazy">
+          <div class="media-overlay"></div>
+        </div>
+        <div class="media-body">
+          <img src="_knowledge/logos/Globonews_logo.png" alt="GloboNews" class="media-logo">
+          <div class="media-title">GloboNews — Inovação em Saúde</div>
+          <p class="media-text">A GloboNews destaca a tecnologia da Fisioatual como inovação transformadora no campo da neuroreabilitação no Brasil.</p>
+        </div>
+      </div>
+      <div class="media-card reveal reveal-delay-2">
+        <div class="media-photo">
+          <img src="_knowledge/fotos/produto/RecordTV.jpeg" alt="Fisioatual na Record TV" loading="lazy">
+          <div class="media-overlay"></div>
+        </div>
+        <div class="media-body">
+          <img src="_knowledge/logos/logo_record.png" alt="Record TV" class="media-logo">
+          <div class="media-title">Record TV — Tecnologia que Transforma</div>
+          <p class="media-text">Matéria especial sobre o simulador robótico e o impacto da realidade virtual na reabilitação de crianças com deficiência motora.</p>
+        </div>
+      </div>
+      <div class="media-card reveal reveal-delay-3">
+        <div class="media-photo">
+          <img src="_knowledge/fotos/produto/APAE37 - Copia.jpg" alt="APAE — Fisioatual" loading="lazy">
+          <div class="media-overlay"></div>
+        </div>
+        <div class="media-body">
+          <img src="_knowledge/logos/logo folha.png" alt="Folha de SP" class="media-logo" style="height:28px;filter:brightness(0) invert(1);opacity:1">
+          <div class="media-title">Folha de São Paulo — Healthtech Brasileira</div>
+          <p class="media-text">Startup de reabilitação robótica recebe financiamento FAPESP PIPE e apresenta solução inovadora para pacientes neurológicos.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════ ODS / IMPACTO SOCIAL ═══════════ -->
+<section class="ods-section">
+  <div class="ods-inner">
+    <div class="section-tag">Impacto social</div>
+    <h2 class="section-h reveal">
+      <span class="light">Tecnologia com</span>
+      PROPÓSITO GLOBAL
+    </h2>
+    <p class="section-p reveal reveal-delay-1">A Fisioatual está alinhada aos Objetivos de Desenvolvimento Sustentável da ONU — democratizando o acesso à reabilitação e reduzindo desigualdades em saúde no Brasil e no mundo.</p>
+    <div class="ods-grid">
+      <div class="ods-card reveal reveal-delay-1">
+        <img src="_knowledge/logos/ODS_3.png" alt="ODS 3 — Saúde e Bem-Estar" loading="lazy">
+        <h3>ODS 3 — Saúde e Bem-Estar</h3>
+        <p>Ampliar o acesso a cuidados de saúde de qualidade para crianças com deficiência motora e adultos que precisam de reabilitação neurológica.</p>
+      </div>
+      <div class="ods-card reveal reveal-delay-2">
+        <img src="_knowledge/logos/ODS_10.png" alt="ODS 10 — Redução das Desigualdades" loading="lazy">
+        <h3>ODS 10 — Redução das Desigualdades</h3>
+        <p>Democratizar a reabilitação robótica — hoje exclusiva de grandes centros — tornando-a acessível a clínicas e comunidades de qualquer porte.</p>
+      </div>
+      <div class="ods-card reveal reveal-delay-3">
+        <img src="_knowledge/logos/ODS11.png" alt="ODS 11 — Cidades Sustentáveis" loading="lazy">
+        <h3>ODS 11 — Cidades Sustentáveis</h3>
+        <p>Incluir pessoas com deficiência na vida ativa das cidades — com mais funcionalidade, autonomia e qualidade de vida.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════ SOBRE / FUNDADOR ═══════════ -->
+<section class="about-section" id="sobre">
+  <div class="about-inner">
+    <div class="about-grid">
+      <div class="about-text reveal reveal-delay-1">
+        <div class="section-tag">O fundador</div>
+        <h2 class="section-h">
+          <span class="light">Fisioterapeuta,</span>
+          PESQUISADOR & EMPREENDEDOR
+        </h2>
+        <p>Formado pela UFSCar e Mestre em Ciências da Reabilitação pela Faculdade de Medicina da USP, fundou a Fisioatual com uma missão: democratizar o acesso à reabilitação tecnológica no Brasil.</p>
+        <p>A ideia nasceu da dificuldade de engajar o filho, nativo digital, em seu tratamento postural — e se transformou, com a inspiração de um disco de arado adaptado como uma panela wok, em uma plataforma com patentes depositadas, fomento FAPESP e presença em congressos mundiais Tokyo, Dubai, Lisboa, Punta del Este, Fortaleza e São Paulo.</p>
+        <p>Em 2025, realizou visitas técnicas ao Innovation Center da Fujita Health University (Tokyo), Osaka Expo 2025, Institute for Systems and Robotics da Universidade de Lisboa e NeuroRehabLab (Funchal) — absorvendo o estado da arte global em reabilitação robótica.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════ FAQ ═══════════ -->
+<section class="faq-section" id="faq">
+  <div class="faq-inner">
+    <div class="faq-layout">
+      <div class="faq-sticky reveal">
+        <div class="section-tag">FAQ</div>
+        <h2 class="section-h" style="font-size:clamp(2.5rem,4.5vw,4rem)">
+          <span class="light">Perguntas</span>
+          FREQUENTES
+        </h2>
+        <p style="font-size:.92rem;color:var(--muted);line-height:1.8;margin-bottom:2rem">Tire suas dúvidas sobre o simulador e a plataforma Fisioatual. Não encontrou o que precisava?</p>
+        <a href="#lead" class="btn-main">Falar com a equipe →</a>
+      </div>
+
+      <div class="accordion reveal reveal-delay-1">
+        <div class="acc-item">
+          <button class="acc-trigger">Qual espaço físico é necessário para o simulador?<div class="acc-icon">+</div></button>
+          <div class="acc-content"><div class="acc-inner">O simulador clínico ocupa aproximadamente 3m × 3m, com pé-direito mínimo de 2,5m. Cabe em salas de fisioterapia convencionais sem necessidade de obras. A versão domiciliar (rolling disk) é compacta e portátil, cabendo em qualquer cômodo.</div></div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-trigger">Os fisioterapeutas precisam de treinamento especial?<div class="acc-icon">+</div></button>
+          <div class="acc-content"><div class="acc-inner">Oferecemos treinamento completo — presencial ou online. O onboarding dura 1 a 2 dias e inclui: operação do equipamento, configuração dos games terapêuticos, uso do dashboard clínico com IA e protocolos de atendimento por diagnóstico.</div></div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-trigger">Qual é o modelo de cobrança?<div class="acc-icon">+</div></button>
+          <div class="acc-content"><div class="acc-inner">Hardware (simulador robótico) + assinatura mensal da plataforma SaaS. Similar ao modelo "Netflix" — uma mensalidade dá acesso a toda a biblioteca de games, atualizações e novos protocolos sem custo adicional. Entre em contato para proposta personalizada.</div></div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-trigger">Para quais diagnósticos o simulador é indicado?<div class="acc-icon">+</div></button>
+          <div class="acc-content"><div class="acc-inner">O simulador trata desequilíbrios, treina propriocepção, coordenação, controle de tronco e transferências de peso. Indicado para: paralisia cerebral, AVC, lesões medulares, ataxias, neuropatias e prevenção de quedas em idosos.</div></div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-trigger">Qual o estágio atual da empresa? (para investidores)<div class="acc-icon">+</div></button>
+          <div class="acc-content"><div class="acc-inner">Early stage — MVP concluído, em primeiras vendas (clínicas e entidades PcD) e regularização ANVISA. Funding atual via FAPESP PIPE Fase 2 (até R$3,3M equity-free). Próxima etapa: PIPE Invest e captação com fundos healthtech estratégicos.</div></div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-trigger">Qual é o mercado total endereçável (TAM)?<div class="acc-icon">+</div></button>
+          <div class="acc-content"><div class="acc-inner">Mercado global de reabilitação robótica projetado em US$25B até 2030 (CAGR 8,5%). No Brasil: 17M de pessoas com deficiência + 30M de idosos (60+) até 2050 — demanda crescente e estruturalmente subatendida pela inversão da pirâmide demográfica.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════ LEAD CAPTURE ═══════════ -->
+<section class="lead-section" id="lead">
+  <div class="lead-bg"></div>
+  <div class="lead-grid-lines"></div>
+  <div class="lead-inner">
+    <div class="lead-grid">
+      <div class="lead-left reveal">
+        <div class="section-tag">Fale com a gente</div>
+        <h2 class="section-h" style="font-size:clamp(2.5rem,5vw,4.5rem)">
+          <span class="light">Transforme sua clínica</span>
+          AGORA
+        </h2>
+        <p style="font-size:.95rem;color:var(--muted);line-height:1.85;margin-bottom:1.5rem">Você diretor de clínica, fisioterapeuta, gestor institucional, hospitalar ou investidor — queremos conversar. Ouvir você.</p>
+        <div class="lead-value-list">
+          <div class="lv-item"><div class="lv-icon">✓</div>Fale-nos sobre suas dificuldades na rotina clínica</div>
+          <div class="lv-item"><div class="lv-icon">✓</div>Dê suas sugestões e torne nossa solução a solução ideal para você e seus pacientes</div>
+          <div class="lv-item"><div class="lv-icon">✓</div>Só quem vive o dia a dia com o paciente sabe o que é melhor para ele</div>
+          <div class="lv-item"><div class="lv-icon">✓</div>Co-criação e melhoria contínua — você pede e nós implementamos</div>
+          <div class="lv-item"><div class="lv-icon">✓</div>Deixe-nos adequar as tecnologias disponíveis atualmente às suas necessidades</div>
+        </div>
+        <div class="lead-alt">
+          <a href="https://wa.me/5517XXXXXXXXX?text=Ol%C3%A1%2C%20quero%20conhecer%20a%20Fisioatual" target="_blank" rel="noopener"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> WhatsApp</a>
+        </div>
+      </div>
+
+      <div class="reveal reveal-delay-2">
+        <div class="form-card">
+          <h3>Agende uma Demonstração</h3>
+          <p>Preencha e nossa equipe entra em contato</p>
+          <form id="lead-form" action="https://formsubmit.co/daltonkina@gmail.com" method="POST">
+            <input type="hidden" name="_subject" value="🚀 Novo Lead — Fisioatual simulador">
+            <input type="hidden" name="_captcha" value="false">
+            <input type="hidden" name="_template" value="table">
+            <input type="text" name="_honey" style="display:none">
+
+            <div style="margin-bottom:.875rem">
+              <div class="form-field" style="margin-bottom:.5rem">
+                <label>Seu perfil *</label>
+              </div>
+              <div class="form-radio-group">
+                <label class="form-radio"><input type="radio" name="perfil" value="Clínica/Hospital/Entidade PcD" required><span class="form-radio-label">🏥 Clínica / Hospital / Entidade PcD</span></label>
+                <label class="form-radio"><input type="radio" name="perfil" value="Investidor/VC"><span class="form-radio-label">💼 Investidor / VC / Fundo</span></label>
+                <label class="form-radio"><input type="radio" name="perfil" value="Parceiro Institucional"><span class="form-radio-label">🤝 Parceiro Institucional</span></label>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-field">
+                <label>Nome completo *</label>
+                <input type="text" name="nome" placeholder="Seu nome" required>
+              </div>
+              <div class="form-field">
+                <label>Telefone / WhatsApp</label>
+                <input type="tel" name="telefone" placeholder="(11) 99999-9999">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-field">
+                <label>E-mail *</label>
+                <input type="email" name="email" placeholder="seuemail@clinica.com" required>
+              </div>
+              <div class="form-field">
+                <label>Instituição / Clínica</label>
+                <input type="text" name="instituicao" placeholder="Nome da instituição">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-field form-full">
+                <label>Mensagem</label>
+                <textarea name="mensagem" placeholder="Conte-nos sobre seu interesse..."></textarea>
+              </div>
+            </div>
+
+            <button type="submit" class="form-submit">Quero uma demonstração →</button>
+            <p class="form-note">🔒 Seus dados são protegidos.</p>
+            <div id="form-status"></div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════ FOOTER ═══════════ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="#hero" class="nav-logo" style="margin-bottom:.75rem;display:inline-flex">
+          <img src="_knowledge/identidade-visual/FisioAtual2.png" alt="Fisioatual" style="height:28px;width:auto">
+          <span class="logo-text">fisio<span>atual</span></span>
+        </a>
+        <p>Streaming de games e experiências imersivas em RV (SaaS) que democratiza a reabilitação robótica para pacientes neurológicos.</p>
+        <div style="display:flex;gap:.85rem;margin-top:.75rem">
+          <a href="https://www.facebook.com/fisioatual" target="_blank" rel="noopener" aria-label="Facebook" style="display:flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.1);color:#fff;text-decoration:none;transition:background .2s" onmouseover="this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.background='rgba(255,255,255,.1)'">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          </a>
+          <a href="https://www.instagram.com/fisioatual" target="_blank" rel="noopener" aria-label="Instagram" style="display:flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.1);color:#fff;text-decoration:none;transition:background .2s" onmouseover="this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.background='rgba(255,255,255,.1)'">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+          </a>
+          <a href="https://wa.me/5517XXXXXXXXX?text=Ol%C3%A1%2C%20quero%20conhecer%20a%20Fisioatual" target="_blank" rel="noopener" aria-label="WhatsApp" style="display:flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.1);color:#fff;text-decoration:none;transition:background .2s" onmouseover="this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.background='rgba(255,255,255,.1)'">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          </a>
+          <a href="https://www.linkedin.com/company/fisioatual" target="_blank" rel="noopener" aria-label="LinkedIn" style="display:flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.1);color:#fff;text-decoration:none;transition:background .2s" onmouseover="this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.background='rgba(255,255,255,.1)'">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          </a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Navegação</h4>
+        <a href="#solucao">Solução / Produto</a>
+        <a href="#validacao">Validação Científica</a>
+        <a href="#midia">Mídia</a>
+        <a href="#sobre">Sobre</a>
+        <a href="#faq">FAQ</a>
+        <a href="#lead">Contato</a>
+      </div>
+      <div class="footer-col">
+        <h4>Contato</h4>
+        <a href="mailto:daltonkina@gmail.com">daltonkina@gmail.com</a>
+        <a href="#lead">Agendar Demonstração</a>
+        <a href="#lead">Falar sobre Investimento</a>
+        <a href="#lead">Parcerias Institucionais</a>
+      </div>
+      <div class="footer-col">
+        <h4>Institucional</h4>
+        <a href="#validacao">FAPESP PIPE Fase 2</a>
+        <a href="#validacao">3 Patentes — INPI · WIPO</a>
+        <a href="#validacao">7 Congressos Mundiais</a>
+        <a href="#sobre">USP · UFSCar · ISVR</a>
+        <a href="#dor">Dados de Mercado</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 Fisioatual Healthtech. Todos os direitos reservados. Tecnologia 100% nacional.</p>
+      <p style="color:var(--dim)">São Paulo, Brasil</p>
+    </div>
+  </div>
+</footer>
+
+
+
+<!-- ═══════════ SCRIPTS ═══════════ -->
+<script>
+// ── Scroll Reveal ──
+const ro = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('visible'); ro.unobserve(e.target); } });
+}, { threshold: 0.1, rootMargin:'0px 0px -32px 0px' });
+document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
+
+// ── Hamburger ──
+const burger = document.getElementById('burger');
+const menu   = document.getElementById('mobileMenu');
+burger.addEventListener('click', () => {
+  burger.classList.toggle('active');
+  menu.classList.toggle('open');
+  document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : '';
+});
+menu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+  burger.classList.remove('active'); menu.classList.remove('open'); document.body.style.overflow = '';
+}));
+
+// ── Smooth scroll ──
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const t = document.querySelector(a.getAttribute('href'));
+    if(!t) return; e.preventDefault();
+    t.scrollIntoView({ behavior:'smooth', block:'start' });
+  });
+});
+
+// ── FAQ Accordion ──
+document.querySelectorAll('.acc-trigger').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const item = btn.closest('.acc-item');
+    const content = item.querySelector('.acc-content');
+    const inner = item.querySelector('.acc-inner');
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.acc-item.open').forEach(o => {
+      o.classList.remove('open');
+      o.querySelector('.acc-content').style.maxHeight = '0';
+    });
+    if(!isOpen){ item.classList.add('open'); content.style.maxHeight = inner.scrollHeight + 'px'; }
+  });
+});
+
+// ── Main Video Player ──
+const mainVid = document.getElementById('mainVid');
+const mainBtn = document.getElementById('mainPlayBtn');
+if(mainVid && mainBtn){
+  const wrapper = mainVid.closest('.vid-wrap');
+  wrapper.addEventListener('click', () => {
+    if(mainVid.paused){ mainVid.play(); mainBtn.style.opacity='0'; }
+    else { mainVid.pause(); mainBtn.style.opacity='1'; }
+  });
+  mainVid.addEventListener('ended', () => mainBtn.style.opacity='1');
+}
+
+// ── Coletas Video Player ──
+const coletasVid = document.getElementById('coletasVid');
+const coletasBtn = document.getElementById('coletasPlayBtn');
+if(coletasVid && coletasBtn){
+  const wrapper = coletasVid.closest('.vid-wrap');
+  wrapper.addEventListener('click', () => {
+    if(coletasVid.paused){ coletasVid.play(); coletasBtn.style.opacity='0'; }
+    else { coletasVid.pause(); coletasBtn.style.opacity='1'; }
+  });
+  coletasVid.addEventListener('ended', () => coletasBtn.style.opacity='1');
+}
+
+// ── Hero Carousel ──
+(function(){
+  const slides = document.querySelectorAll('.hero-slide');
+  const dots   = document.querySelectorAll('.carousel-dot');
+  if(!slides.length) return;
+  let cur = 0, timer;
+  function goTo(n){
+    slides[cur].classList.remove('active');
+    dots[cur].classList.remove('active');
+    cur = (n + slides.length) % slides.length;
+    slides[cur].classList.add('active');
+    dots[cur].classList.add('active');
+  }
+  timer = setInterval(() => goTo(cur + 1), 10000);
+  dots.forEach((d, i) => d.addEventListener('click', () => {
+    clearInterval(timer);
+    goTo(i);
+    timer = setInterval(() => goTo(cur + 1), 10000);
+  }));
+})();
+
+// ── Form Submit ──
+const form = document.getElementById('lead-form');
+const fstatus = document.getElementById('form-status');
+if(form) form.addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = form.querySelector('.form-submit');
+  const orig = btn.textContent;
+  btn.textContent = 'Enviando...'; btn.disabled = true;
+  try {
+    const r = await fetch(form.action, { method:'POST', body:new FormData(form), headers:{'Accept':'application/json'} });
+    if(r.ok){
+      fstatus.style.cssText = 'display:block;background:rgba(0,197,98,.1);border:1px solid rgba(0,197,98,.25);color:#7ff5b5;padding:.875rem 1.25rem;border-radius:8px;font-size:.875rem';
+      fstatus.textContent = '✅ Recebemos! Entraremos em contato em breve.';
+      form.reset();
+    } else throw new Error();
+  } catch {
+    fstatus.style.cssText = 'display:block;background:rgba(255,80,80,.1);border:1px solid rgba(255,80,80,.25);color:#ff9090;padding:.875rem 1.25rem;border-radius:8px;font-size:.875rem';
+    fstatus.textContent = '❌ Erro ao enviar. Contate: daltonkina@gmail.com';
+  }
+  btn.textContent = orig; btn.disabled = false;
+  setTimeout(() => fstatus.style.display='none', 8000);
+});
+</script>
+
+</body>
+</html>

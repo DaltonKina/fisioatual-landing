@@ -1,0 +1,88 @@
+:root {
+  /* Brand Colors — V4 Design System */
+  --orange:        #FF5C1A;
+  --orange-dark:   #E04800;
+  --orange-light:  #FF7A3D;
+  --orange-glow:   rgba(255, 92, 26, 0.12);
+
+  --green:         #00C562;  /* primary accent — matches hardware color */
+  --green-dark:    #00A050;
+  --green-glow:    rgba(0, 197, 98, 0.12);
+  --green-dim:     rgba(0, 197, 98, 0.06);
+  --green-border:  rgba(0, 197, 98, 0.22);
+
+  --green-neon:    #39C13F;
+  --gray-brand:    #808080;
+
+  /* Dark Palette */
+  --dark-bg:       #080C18;
+  --dark-surface:  #0F1424;
+  --dark-card:     #141828;
+  --dark-border:   rgba(255, 255, 255, 0.08);
+  --dark-border-hover: rgba(245, 137, 26, 0.4);
+
+  /* Light Palette */
+  --white:         #FFFFFF;
+  --light-bg:      #F8F9FC;
+  --light-surface: #EEF0F6;
+  --light-border:  #E2E4EC;
+
+  /* Tech Accents */
+  --blue-elec:     #0080FF;
+  --cyan:          #00D4FF;
+  --gradient-tech: linear-gradient(135deg, #0080FF 0%, #00D4FF 100%);
+  --gradient-brand: linear-gradient(135deg, #F5891A 0%, #FFB347 100%);
+  --gradient-dark: linear-gradient(180deg, #080C18 0%, #0F1424 100%);
+  --gradient-hero: linear-gradient(
+    135deg,
+    rgba(8, 12, 24, 0.92) 0%,
+    rgba(15, 20, 36, 0.85) 50%,
+    rgba(0, 128, 255, 0.1) 100%
+  );
+
+  /* Typography */
+  --text-primary:  #FFFFFF;
+  --text-secondary: rgba(255,255,255,0.72);
+  --text-muted:    rgba(255,255,255,0.45);
+  --text-dark:     #1A1A2E;
+  --text-dark-secondary: #4A4A6A;
+  --text-dark-muted: #8A8A9A;
+
+  /* Spacing */
+  --space-xs:  0.25rem;
+  --space-sm:  0.5rem;
+  --space-md:  1rem;
+  --space-lg:  1.5rem;
+  --space-xl:  2rem;
+  --space-2xl: 3rem;
+  --space-3xl: 4rem;
+  --space-4xl: 6rem;
+  --space-5xl: 8rem;
+
+  /* Border Radius */
+  --radius-sm:   6px;
+  --radius-md:   12px;
+  --radius-lg:   20px;
+  --radius-xl:   32px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm:     0 2px 8px rgba(0,0,0,0.12);
+  --shadow-md:     0 8px 24px rgba(0,0,0,0.18);
+  --shadow-lg:     0 16px 48px rgba(0,0,0,0.24);
+  --shadow-orange: 0 8px 32px rgba(245, 137, 26, 0.35);
+  --shadow-green:  0 8px 32px rgba(57, 193, 63, 0.3);
+  --shadow-blue:   0 8px 32px rgba(0, 128, 255, 0.3);
+
+  /* Transitions */
+  --transition-fast:   150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base:   250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow:   400ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Layout */
+  --container-max:  1280px;
+  --container-wide: 1440px;
+  --nav-height:     72px;
+  --section-pad:    clamp(4rem, 8vw, 7rem);
+}

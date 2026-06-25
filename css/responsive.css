@@ -1,0 +1,148 @@
+/* ========== TABLET: ≤ 1024px ========== */
+@media (max-width: 1024px) {
+  :root { --section-pad: clamp(3rem, 6vw, 5rem); }
+
+  .nav__links { display: none; }
+  .hamburger { display: flex; }
+  .nav__mobile { display: flex; }
+
+  /* Hero */
+  .hero__content { max-width: 100%; }
+  .hero__title { font-size: clamp(2.25rem, 5.5vw, 3.75rem); }
+
+  /* Stats */
+  .stats__grid { grid-template-columns: repeat(2, 1fr); }
+  .stats__grid-2 { grid-template-columns: repeat(2, 1fr); }
+
+  /* About */
+  .about__grid { grid-template-columns: 1fr; gap: 2.5rem; }
+
+  /* Product */
+  .product__steps { grid-template-columns: 1fr; gap: 2.5rem; }
+  .product__step:not(:last-child)::after { display: none; }
+  .product__video-section { grid-template-columns: 1fr; }
+
+  /* Benefits */
+  .benefits__grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* Validation */
+  .validation__patents { grid-template-columns: repeat(2, 1fr); }
+
+  /* Media */
+  .media__grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* Awards */
+  .awards__grid { grid-template-columns: 1fr; }
+
+  /* ODS */
+  .ods__grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* CTA */
+  .cta-section__grid { grid-template-columns: 1fr; gap: 3rem; }
+
+  /* FAQ */
+  .faq__grid { grid-template-columns: 1fr; }
+  .faq__left { position: relative; top: auto; }
+
+  /* Footer */
+  .footer__top { grid-template-columns: 1fr 1fr; gap: 2rem; }
+}
+
+/* ========== MOBILE LARGE: ≤ 768px ========== */
+@media (max-width: 768px) {
+  :root { --nav-height: 60px; }
+
+  /* Hero */
+  .hero__title { font-size: clamp(2rem, 7vw, 2.75rem); }
+  .hero__subtitle { font-size: 1rem; }
+  .hero__ctas { flex-direction: column; }
+  .hero__ctas .btn { width: 100%; justify-content: center; }
+  .hero__proof { display: none; }
+  .hero__scroll { display: none; }
+
+  /* Stats */
+  .stats__grid { grid-template-columns: 1fr; }
+  .stats__grid-2 { grid-template-columns: 1fr 1fr; }
+
+  /* Benefits tabs */
+  .benefits__tabs { flex-direction: column; width: 100%; border-radius: var(--radius-lg); }
+  .benefits__grid { grid-template-columns: 1fr; }
+
+  /* Validation */
+  .validation__patents { grid-template-columns: 1fr; }
+  .congress-table { font-size: 0.8rem; }
+  .congress-table td, .congress-table th { padding: 0.625rem 0.875rem; }
+
+  /* Media */
+  .media__grid { grid-template-columns: 1fr; }
+
+  /* ODS */
+  .ods__grid { grid-template-columns: 1fr; }
+
+  /* About credentials */
+  .about__credentials { grid-template-columns: repeat(2, 1fr); }
+
+  /* CTA */
+  .cta-section__alternatives { flex-direction: column; }
+
+  /* Footer */
+  .footer__top { grid-template-columns: 1fr; }
+  .footer__bottom { flex-direction: column; align-items: flex-start; }
+  .footer__seals { display: none; }
+}
+
+/* ========== MOBILE SMALL: ≤ 480px ========== */
+@media (max-width: 480px) {
+  :root { --section-pad: 3rem; }
+
+  .hero__title { font-size: clamp(1.75rem, 8vw, 2.25rem); }
+
+  .stats__grid-2 { grid-template-columns: 1fr; }
+
+  .btn--lg {
+    padding: 0.875rem 1.75rem;
+    font-size: 0.9375rem;
+  }
+
+  .about__credentials { grid-template-columns: 1fr 1fr; }
+
+  .card { padding: 1.5rem; }
+
+  .awards__grid { grid-template-columns: 1fr; }
+  .awards__featured { padding: 2rem; }
+
+  .cta-section__form-card { padding: 1.5rem; }
+
+  .congress-table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* ========== HOVER ONLY (not touch) ========== */
+@media (hover: none) {
+  .card:hover,
+  .benefit-card:hover,
+  .award-card:hover,
+  .media-card:hover { transform: none; }
+
+  .btn:hover { transform: none; }
+}
+
+/* ========== REDUCED MOTION ========== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .logos-track,
+  .logo-bar__track { animation: none; }
+
+  .hero-badge, .hero-title, .hero-subtitle,
+  .hero-ctas, .hero-proof { opacity: 1; animation: none; }
+
+  .reveal { opacity: 1; transform: none; }
+}
