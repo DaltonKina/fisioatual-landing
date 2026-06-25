@@ -300,6 +300,9 @@ nav{
 .vid-wrap{padding-bottom:56.25%;position:relative;height:0;border-radius:var(--r2);overflow:hidden;background:var(--dark3)}
 .vid-wrap-sm{padding-bottom:56.25%;position:relative;height:0;border-radius:var(--r);overflow:hidden;background:var(--dark3)}
 .vid-wrap iframe,.vid-wrap-sm iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0}
+.yt-mask{position:absolute;left:0;right:0;z-index:5;pointer-events:none}
+.yt-mask-top{top:0;height:72px;background:linear-gradient(to bottom,rgba(6,14,8,1) 30%,transparent)}
+.yt-mask-bottom{bottom:0;height:90px;background:linear-gradient(to top,rgba(6,14,8,1) 30%,transparent)}
 .vid-wrap video,.vid-wrap-sm video{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;cursor:pointer}
 .vid-play-btn{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:64px;height:64px;background:rgba(0,197,98,.95);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.3rem;color:#000;transition:all .2s;box-shadow:0 8px 32px rgba(0,197,98,.4);cursor:pointer;z-index:2}
 .vid-wrap:hover .vid-play-btn,.vid-wrap-sm:hover .vid-play-btn{transform:translate(-50%,-50%) scale(1.1)}
@@ -994,11 +997,15 @@ footer{background:#050b07;padding:5rem 5vw 2.5rem;border-top:1px solid var(--bor
       <div class="vid-main">
         <div class="vid-wrap" style="padding-bottom:177.78%">
           <iframe src="https://www.youtube.com/embed/ImrbeZ7iqb8?rel=0&modestbranding=1" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen title="Simulador em clínica"></iframe>
+          <div class="yt-mask yt-mask-top"></div>
+          <div class="yt-mask yt-mask-bottom"></div>
         </div>
       </div>
       <div class="vid-main">
         <div class="vid-wrap" style="padding-bottom:177.78%">
           <iframe src="https://www.youtube.com/embed/Uct2vbwQ0sQ?rel=0&modestbranding=1" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen title="Coleta de dados clínicos"></iframe>
+          <div class="yt-mask yt-mask-top"></div>
+          <div class="yt-mask yt-mask-bottom"></div>
         </div>
       </div>
     </div>
