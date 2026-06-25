@@ -7,308 +7,88 @@
   const SIZE = 720;
   canvas.width  = SIZE;
   canvas.height = SIZE;
-
   const ctx = canvas.getContext('2d');
-  const cx = SIZE / 2, cy = SIZE / 2, R = SIZE / 2 - 1;
 
-  // Detailed continent outlines [lon, lat] – more points = smoother coastlines
-  const CONTINENTS = [
-    // ── North America ────────────────────────────────────────────────────────
-    [
-      [-168,66],[-164,68],[-162,70],[-156,72],[-148,70],[-140,70],
-      [-130,70],[-120,72],[-100,73],[-90,72],[-80,72],[-70,74],
-      [-62,68],[-60,64],[-64,63],[-68,65],[-68,62],[-72,60],
-      [-76,58],[-80,62],[-86,64],[-90,66],[-92,70],[-86,68],
-      [-78,70],[-72,72],
-      // East coast
-      [-55,52],[-53,47],[-66,45],[-70,42],[-74,40],
-      [-76,37],[-76,35],[-80,32],[-81,30],[-82,30],
-      // Florida & Gulf
-      [-81,26],[-80,25],[-84,29],[-88,29],[-90,29],
-      [-94,29],[-97,26],
-      // Mexico & Central Am.
-      [-105,20],[-90,16],[-88,16],[-84,11],[-83,10],[-77,8],
-      // West coast back north
-      [-80,9],[-88,16],[-105,22],[-110,24],[-115,28],
-      [-117,32],[-120,35],[-122,38],[-124,41],
-      [-124,46],[-124,48],[-126,50],[-130,54],
-      [-136,58],[-140,60],[-148,60],[-156,58],[-168,66]
-    ],
-    // ── Greenland ─────────────────────────────────────────────────────────────
-    [
-      [-55,76],[-42,76],[-25,72],[-17,68],[-20,65],[-30,63],
-      [-42,60],[-48,62],[-52,66],[-52,70],[-55,76]
-    ],
-    // ── South America ─────────────────────────────────────────────────────────
-    [
-      [-80,12],[-75,10],[-70,12],[-65,11],[-60,10],[-55,6],
-      [-52,4],[-50,2],[-44,-2],[-38,-4],[-35,-6],[-35,-9],
-      [-36,-14],[-38,-18],[-40,-20],[-42,-23],[-44,-24],
-      [-48,-28],[-50,-29],[-52,-32],[-52,-34],[-54,-36],
-      [-58,-40],[-62,-44],[-65,-46],[-66,-50],[-68,-54],
-      [-68,-56],[-72,-52],[-75,-52],[-72,-46],[-72,-40],
-      [-68,-38],[-70,-32],[-72,-24],[-70,-18],[-68,-12],
-      [-70,-4],[-72,0],[-75,2],[-76,6],[-78,8],
-      [-80,10],[-80,12]
-    ],
-    // ── Europe ────────────────────────────────────────────────────────────────
-    [
-      [-10,36],[-8,36],[-2,36],[2,36],[6,36],[12,36],
-      [18,38],[24,38],[28,40],[30,40],[36,36],[36,38],
-      [32,42],[28,42],[26,44],[24,44],[24,48],[28,52],
-      [30,56],[26,58],[24,60],[26,62],[28,66],[28,70],
-      [24,72],[18,70],[14,66],[10,58],[8,56],[4,52],
-      [2,52],[0,50],[-2,50],[-4,48],[-4,44],[-6,42],
-      [-8,40],[-10,38],[-10,36]
-    ],
-    // ── Scandinavia ───────────────────────────────────────────────────────────
-    [
-      [4,58],[8,58],[10,56],[14,56],[18,58],[22,60],
-      [26,62],[28,66],[28,70],[24,72],[20,70],[18,68],
-      [16,68],[14,66],[10,62],[8,60],[4,58]
-    ],
-    // ── Africa ────────────────────────────────────────────────────────────────
-    [
-      [-17,14],[-14,10],[-16,6],[-14,4],[-10,4],[-8,4],
-      [-4,4],[0,4],[4,4],[8,4],[10,4],[12,2],[14,0],
-      [14,-4],[16,-6],[18,-8],[20,-10],[24,-12],[28,-14],
-      [32,-16],[36,-20],[40,-16],[44,-12],[46,-10],[44,-8],
-      [42,-4],[40,2],[42,6],[44,10],[44,12],[42,12],
-      [40,14],[38,16],[36,18],[36,22],[34,22],[30,24],
-      [28,30],[32,30],[34,28],[34,32],[36,34],[36,36],
-      [30,34],[28,36],[24,38],[18,38],[12,36],[6,36],
-      [2,36],[-4,34],[-8,36],[-16,22],[-18,18],[-18,14],[-17,14]
-    ],
-    // ── Asia (West + Central) ─────────────────────────────────────────────────
-    [
-      [26,42],[30,40],[36,36],[36,38],[40,38],[44,40],
-      [48,38],[52,36],[56,26],[58,22],[60,24],[62,24],
-      [64,22],[68,24],[70,20],[72,20],[76,10],[80,8],
-      [80,10],[82,12],[84,14],[86,18],[90,22],[92,24],
-      [94,22],[98,20],[100,4],[102,2],[104,2],[106,4],
-      [108,12],[108,16],[106,20],[104,24],[106,26],[108,28],
-      [108,32],[112,32],[116,36],[120,40],[124,40],[128,40],
-      [130,34],[132,34],[134,32],[132,30],[128,30],[126,28],
-      [120,22],[118,24],[116,22],[110,20],[110,18],[112,14],
-      [110,12],[108,16],
-      // Back to Arabia and Turkey
-      [106,20],[100,22],[90,28],[86,28],[82,28],[80,30],
-      [76,34],[72,36],[70,40],[64,40],[60,40],[56,40],
-      [52,40],[48,40],[44,40],[40,40],[36,42],[30,44],[26,42]
-    ],
-    // ── Arabian Peninsula ─────────────────────────────────────────────────────
-    [
-      [36,28],[38,22],[40,16],[44,12],[50,12],[54,16],
-      [56,22],[58,22],[56,26],[52,24],[48,22],[44,22],
-      [40,22],[36,24],[36,28]
-    ],
-    // ── Indian subcontinent ───────────────────────────────────────────────────
-    [
-      [66,24],[70,22],[74,22],[78,20],[80,14],[80,8],
-      [78,8],[76,10],[76,12],[74,14],[72,18],[70,20],
-      [66,22],[64,22],[62,22],[60,22],[62,24],[64,24],[66,24]
-    ],
-    // ── Southeast Asia (Indochina) ────────────────────────────────────────────
-    [
-      [96,28],[98,24],[100,22],[104,20],[106,18],[108,16],
-      [108,12],[106,10],[104,6],[104,2],[102,2],[100,4],
-      [100,6],[98,8],[98,12],[96,14],[96,20],[96,24],[96,28]
-    ],
-    // ── Malay Peninsula ──────────────────────────────────────────────────────
-    [
-      [102,6],[104,6],[106,4],[104,2],[102,2],[100,4],[102,6]
-    ],
-    // ── Sumatra ───────────────────────────────────────────────────────────────
-    [
-      [96,6],[100,4],[104,0],[106,-2],[106,-4],[104,-4],
-      [100,-2],[98,0],[96,2],[96,4],[96,6]
-    ],
-    // ── Java ──────────────────────────────────────────────────────────────────
-    [
-      [106,-6],[110,-6],[114,-6],[116,-8],[114,-8],[110,-8],[106,-6]
-    ],
-    // ── Borneo ────────────────────────────────────────────────────────────────
-    [
-      [108,6],[112,6],[116,4],[118,4],[118,2],[116,0],
-      [114,-2],[112,-2],[110,0],[108,2],[108,4],[108,6]
-    ],
-    // ── Japan ─────────────────────────────────────────────────────────────────
-    [
-      [130,32],[132,34],[134,34],[136,36],[138,36],[140,38],
-      [142,40],[144,42],[144,44],[142,44],[140,44],[138,42],
-      [136,40],[134,38],[132,36],[130,34],[130,32]
-    ],
-    // ── Hokkaido ──────────────────────────────────────────────────────────────
-    [
-      [140,44],[142,44],[144,44],[144,46],[142,46],[140,45],[140,44]
-    ],
-    // ── Australia ─────────────────────────────────────────────────────────────
-    [
-      [114,-22],[116,-20],[118,-18],[122,-16],[124,-14],[128,-14],
-      [130,-14],[132,-12],[134,-12],[136,-12],[138,-14],[140,-16],
-      [142,-18],[144,-18],[146,-18],[148,-20],[150,-22],[152,-24],
-      [152,-26],[150,-28],[150,-30],[150,-34],[148,-38],[146,-38],
-      [144,-38],[140,-36],[138,-34],[136,-34],[132,-34],[130,-32],
-      [128,-32],[126,-34],[124,-32],[122,-28],[118,-26],[114,-26],[114,-22]
-    ],
-    // ── New Zealand (North Island) ────────────────────────────────────────────
-    [
-      [172,-36],[174,-36],[176,-38],[178,-38],[176,-40],
-      [174,-40],[172,-38],[172,-36]
-    ],
-    // ── New Zealand (South Island) ────────────────────────────────────────────
-    [
-      [166,-44],[168,-44],[170,-44],[172,-44],[172,-46],
-      [170,-46],[168,-46],[166,-45],[166,-44]
-    ],
-    // ── UK / Ireland ──────────────────────────────────────────────────────────
-    [
-      [-6,50],[-4,50],[-2,50],[0,52],[2,52],[2,54],
-      [0,56],[-2,58],[-4,58],[-4,56],[-4,54],[-6,52],[-6,50]
-    ],
-    // ── Iceland ───────────────────────────────────────────────────────────────
-    [
-      [-24,64],[-22,64],[-14,64],[-14,66],[-16,66],
-      [-20,66],[-24,66],[-24,64]
-    ],
-    // ── Sri Lanka ─────────────────────────────────────────────────────────────
-    [
-      [80,10],[80,8],[80,6],[82,6],[82,8],[80,10]
-    ],
-    // ── Philippines (Luzon) ───────────────────────────────────────────────────
-    [
-      [118,16],[120,16],[122,18],[122,20],[120,20],[118,18],[118,16]
-    ],
-  ];
+  // GIF source — browser decodes and advances frames automatically
+  const src = new Image();
+  src.crossOrigin = 'anonymous';
+  src.src = '_knowledge/videos/gif-earth-slow.gif';
 
-  // Smooth bezier curve rendering (Catmull-Rom style)
-  function drawSmooth(pts) {
-    if (pts.length < 2) return;
-    ctx.moveTo(pts[0][0], pts[0][1]);
-    for (let i = 1; i < pts.length - 1; i++) {
-      const mx = (pts[i][0] + pts[i + 1][0]) / 2;
-      const my = (pts[i][1] + pts[i + 1][1]) / 2;
-      ctx.quadraticCurveTo(pts[i][0], pts[i][1], mx, my);
+  // Off-screen buffer: always holds the latest GIF frame
+  const buf = document.createElement('canvas');
+  buf.width = buf.height = SIZE;
+  const bufCtx = buf.getContext('2d', { willReadFrequently: true });
+
+  // "Previous" buffer: snapshot of canvas just before a frame change
+  const prev = document.createElement('canvas');
+  prev.width = prev.height = SIZE;
+  const prevCtx = prev.getContext('2d');
+
+  let lastHash = -1;
+  let blendT    = 1;          // 0 = fully previous frame, 1 = fully current
+  const BLEND   = 16;         // rAF ticks to blend over (~270ms at 60fps)
+
+  // Cheap frame-change detector: samples the center column of pixels
+  function quickHash() {
+    try {
+      const px = bufCtx.getImageData(SIZE >> 1, 0, 1, SIZE >> 1);
+      let h = 0;
+      for (let i = 0; i < px.data.length; i += 16)
+        h = Math.imul(h, 31) + px.data[i] | 0;
+      return h;
+    } catch (_) {
+      // CORS fallback: always trigger blend (safe default)
+      return Math.random() * 1e9 | 0;
     }
-    const last = pts[pts.length - 1];
-    ctx.lineTo(last[0], last[1]);
   }
 
-  // Orthographic projection
-  function project(lon, lat, vlon) {
-    const phi = lat  * Math.PI / 180;
-    const dl  = (lon - vlon) * Math.PI / 180;
-    const x3  =  Math.cos(phi) * Math.sin(dl);
-    const y3  = -Math.sin(phi);
-    const z3  =  Math.cos(phi) * Math.cos(dl);
-    if (z3 <= 0) return null;
-    return [cx + x3 * R, cy + y3 * R];
+  // Ease-in-out for a natural-looking cross-fade
+  function easeInOut(t) {
+    return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
   }
-
-  let viewLon = 0;
 
   function draw() {
+    if (!src.complete || !src.naturalWidth) {
+      requestAnimationFrame(draw);
+      return;
+    }
+
+    // Capture whatever frame the browser is showing right now
+    bufCtx.drawImage(src, 0, 0, SIZE, SIZE);
+    const hash = quickHash();
+
+    if (hash !== lastHash) {
+      // Frame changed — save current canvas output as the "from" state
+      prevCtx.clearRect(0, 0, SIZE, SIZE);
+      prevCtx.drawImage(canvas, 0, 0);
+      lastHash = hash;
+      blendT = 0;
+    }
+
     ctx.clearRect(0, 0, SIZE, SIZE);
-    ctx.save();
 
-    // Clip to sphere
-    ctx.beginPath();
-    ctx.arc(cx, cy, R, 0, Math.PI * 2);
-    ctx.clip();
-
-    // Ocean gradient
-    const ocean = ctx.createRadialGradient(
-      cx - R * 0.28, cy - R * 0.28, R * 0.05,
-      cx, cy, R * 1.05
-    );
-    ocean.addColorStop(0,    '#55d4ff');
-    ocean.addColorStop(0.30, '#0d72bb');
-    ocean.addColorStop(0.75, '#062040');
-    ocean.addColorStop(1,    '#020c1e');
-    ctx.fillStyle = ocean;
-    ctx.fillRect(0, 0, SIZE, SIZE);
-
-    // Continents
-    ctx.fillStyle   = 'rgba(38, 155, 75, 0.90)';
-    ctx.strokeStyle = 'rgba(70, 210, 110, 0.30)';
-    ctx.lineWidth   = 1;
-
-    for (const shape of CONTINENTS) {
-      const pts = shape.map(([lo, la]) => project(lo, la, viewLon));
-      const vis = pts.filter(Boolean);
-      if (vis.length < 3) continue;
-
-      // Build projected visible segments
-      const segments = [];
-      let seg = [];
-      for (const p of pts) {
-        if (p) { seg.push(p); }
-        else if (seg.length) { segments.push(seg); seg = []; }
-      }
-      if (seg.length) segments.push(seg);
-
-      ctx.beginPath();
-      for (const s of segments) {
-        if (s.length < 2) continue;
-        drawSmooth(s);
-      }
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
+    if (blendT < 1) {
+      // GPU-accelerated cross-fade: prev → current
+      const a = easeInOut(blendT);
+      ctx.globalAlpha = 1 - a;
+      ctx.drawImage(prev, 0, 0);
+      ctx.globalAlpha = a;
+      ctx.drawImage(buf, 0, 0);
+      ctx.globalAlpha = 1;
+      blendT = Math.min(1, blendT + 1 / BLEND);
+    } else {
+      ctx.drawImage(buf, 0, 0);
     }
 
-    // Polar ice caps
-    ctx.fillStyle = 'rgba(210, 240, 255, 0.50)';
-    for (const poleLat of [78, -72]) {
-      const ring = [];
-      for (let lo = -180; lo <= 180; lo += 8) {
-        const p = project(lo, poleLat, viewLon);
-        if (p) ring.push(p);
-      }
-      if (ring.length > 2) {
-        ctx.beginPath();
-        ring.forEach((p, i) => i === 0 ? ctx.moveTo(p[0], p[1]) : ctx.lineTo(p[0], p[1]));
-        ctx.closePath();
-        ctx.fill();
-      }
-    }
-
-    // Specular highlight
-    const spec = ctx.createRadialGradient(
-      cx - R * 0.3, cy - R * 0.3, 0,
-      cx - R * 0.3, cy - R * 0.3, R * 0.65
-    );
-    spec.addColorStop(0, 'rgba(255,255,255,0.18)');
-    spec.addColorStop(1, 'transparent');
-    ctx.fillStyle = spec;
-    ctx.fillRect(0, 0, SIZE, SIZE);
-
-    // Atmosphere edge
-    const atm = ctx.createRadialGradient(cx, cy, R * 0.82, cx, cy, R);
-    atm.addColorStop(0, 'transparent');
-    atm.addColorStop(1, 'rgba(100,200,255,0.22)');
-    ctx.fillStyle = atm;
-    ctx.fillRect(0, 0, SIZE, SIZE);
-
-    ctx.restore();
-
-    // Night-side shadow
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(cx, cy, R, 0, Math.PI * 2);
-    ctx.clip();
-    const night = ctx.createRadialGradient(cx + R * 0.5, cy, 0, cx + R * 0.35, cy, R * 1.15);
-    night.addColorStop(0,    'transparent');
-    night.addColorStop(0.55, 'transparent');
-    night.addColorStop(1,    'rgba(0,4,18,0.60)');
-    ctx.fillStyle = night;
-    ctx.fillRect(0, 0, SIZE, SIZE);
-    ctx.restore();
-
-    // Slower rotation: full turn in ~4 minutes
-    viewLon = (viewLon + 0.025) % 360;
     requestAnimationFrame(draw);
   }
 
-  draw();
+  function init() {
+    prevCtx.drawImage(src, 0, 0, SIZE, SIZE);
+    ctx.drawImage(src, 0, 0, SIZE, SIZE);
+    draw();
+  }
+
+  if (src.complete && src.naturalWidth) init();
+  else src.onload = init;
 })();
