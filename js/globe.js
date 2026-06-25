@@ -9,7 +9,7 @@
   canvas.height = SIZE;
   const ctx = canvas.getContext('2d');
 
-  const SPEED_FACTOR = 20; // 20x mais lento que o delay original
+  const SPEED_FACTOR = 70; // 70x mais lento que o delay original
   const BLEND_FRAMES = 8;  // frames de cross-fade entre quadros
   const MAX_FRAMES   = 200; // limite de segurança de quadros
 
@@ -166,6 +166,12 @@
 
       ctx.clearRect(0, 0, SIZE, SIZE);
 
+      // Clip circular: garante que fundo escuro do espaço não vaza para a seção
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(SIZE/2, SIZE/2, SIZE/2 - 2, 0, Math.PI*2);
+      ctx.clip();
+
       if (blendTick < BLEND_FRAMES) {
         const alpha = blendTick / BLEND_FRAMES;
         ctx.globalAlpha = 1-alpha;
@@ -179,15 +185,12 @@
       }
 
       // Brilho atmosférico na borda
-      ctx.save();
-      ctx.beginPath();
-      ctx.arc(SIZE/2, SIZE/2, SIZE/2-1, 0, Math.PI*2);
-      ctx.clip();
       const atm = ctx.createRadialGradient(SIZE/2,SIZE/2,SIZE*.43,SIZE/2,SIZE/2,SIZE/2);
       atm.addColorStop(0,'transparent');
-      atm.addColorStop(1,'rgba(80,180,255,.18)');
+      atm.addColorStop(1,'rgba(80,180,255,.22)');
       ctx.fillStyle=atm;
       ctx.fillRect(0,0,SIZE,SIZE);
+
       ctx.restore();
 
       requestAnimationFrame(draw);
