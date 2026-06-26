@@ -4,6 +4,7 @@ Thumbs.db
 
 # Arquivos grandes de mídia (manter local, não subir para o GitHub)
 _knowledge/videos/*.mp4
+!_knowledge/videos/globe-slow.mp4
 _knowledge/textos/*.pptx
 _knowledge/textos/*.docx
 _knowledge/textos/*.pdf
