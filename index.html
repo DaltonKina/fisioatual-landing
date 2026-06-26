@@ -208,8 +208,8 @@ nav{
 .numbers-section{padding:6rem 5vw;background:linear-gradient(135deg,var(--dark3) 0%,var(--dark) 100%);position:relative;overflow:hidden}
 .numbers-section::after{content:'';position:absolute;bottom:-200px;right:-200px;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(0,197,98,.05),transparent 70%)}
 .numbers-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1}
-#earth-globe{position:absolute;right:-220px;top:50%;transform:translateY(-50%);width:1050px;height:1050px;pointer-events:none;z-index:0;opacity:.32;mix-blend-mode:screen;filter:blur(0.6px);object-fit:contain}
-@media(max-width:768px){#earth-globe{width:420px;height:420px;right:-160px;opacity:.22}}
+#earth-globe{position:absolute;right:-320px;top:50%;transform:translateY(-50%);width:1200px;height:675px;pointer-events:none;z-index:0;opacity:.32;mix-blend-mode:screen;filter:blur(0.6px);object-fit:contain}
+@media(max-width:768px){#earth-globe{width:500px;height:281px;right:-180px;opacity:.22}}
 .numbers-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border-radius:var(--r2);overflow:hidden;border:1px solid var(--border);margin-top:3.5rem}
 .num-item{background:rgba(15,26,18,.82);padding:2.5rem 1.5rem;display:flex;flex-direction:column;gap:.5rem;transition:background .35s,box-shadow .35s}
 .num-item:hover{background:rgba(15,26,18,.45);box-shadow:inset 0 3px 0 var(--g),inset 0 0 0 1px rgba(0,197,98,.45)}
@@ -793,7 +793,7 @@ footer{background:#050b07;padding:5rem 5vw 2.5rem;border-top:1px solid var(--bor
 <!-- ═══════════ NÚMEROS DO MERCADO ═══════════ -->
 <section class="numbers-section">
   <video id="earth-globe" autoplay muted loop playsinline>
-    <source src="_knowledge/videos/gif-earth-5x-blend.webm" type="video/webm">
+    <source src="_knowledge/videos/globe-slow.webm" type="video/webm">
   </video>
   <div class="numbers-inner">
     <div class="section-tag">Tamanho do mercado</div>
