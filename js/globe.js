@@ -5,206 +5,319 @@
   if (!canvas || canvas.tagName !== 'CANVAS') return;
 
   const SIZE = 720;
-  canvas.width = SIZE;
+  canvas.width  = SIZE;
   canvas.height = SIZE;
   const ctx = canvas.getContext('2d');
+  const cx = SIZE / 2, cy = SIZE / 2, R = SIZE / 2 - 1;
 
-  const SPEED_FACTOR = 150; // 150x mais lento que o delay original
-  const BLEND_FRAMES = 8;  // frames de cross-fade entre quadros
-  const MAX_FRAMES   = 200; // limite de segurança de quadros
-
-  // ── LZW decoder eficiente (linked-list com TypedArrays) ───────────────────
-  function lzwDecode(minSize, data) {
-    const clear = 1 << minSize, eof = clear + 1;
-    let codeSize = minSize + 1, mask = (1 << codeSize) - 1;
-
-    const prefix  = new Int32Array(4096).fill(-1);
-    const suffix  = new Uint8Array(4096);
-    const stk     = new Uint8Array(4096);
-    for (let i = 0; i < clear; i++) suffix[i] = i;
-
-    let next = eof + 1, prev = -1, firstByte = 0;
-    let buf = 0, bits = 0, di = 0;
-    const out = [];
-
-    const reset = () => {
-      next = eof + 1; codeSize = minSize + 1; mask = (1 << codeSize) - 1; prev = -1;
-    };
-    const readCode = () => {
-      while (bits < codeSize && di < data.length) { buf |= data[di++] << bits; bits += 8; }
-      const c = buf & mask; buf >>= codeSize; bits -= codeSize; return c;
-    };
-
-    while (di < data.length) {
-      const code = readCode();
-      if (code === clear) { reset(); continue; }
-      if (code === eof)   break;
-
-      let top = 0, c = code;
-      if (c >= next) { stk[top++] = firstByte; c = prev; } // KwKwK special case
-      while (c > eof) { stk[top++] = suffix[c]; c = prefix[c]; }
-      stk[top++] = firstByte = suffix[c];
-      while (top > 0) out.push(stk[--top]);
-
-      if (prev >= 0 && next < 4096) {
-        prefix[next] = prev; suffix[next++] = firstByte;
-        if (next > mask + 1 && codeSize < 12) { codeSize++; mask = (1 << codeSize) - 1; }
+  /* ─── Catmull-Rom spline pre-interpolation in geographic space ─────────────
+     Adds `seg` smooth points between every pair of control points.
+     Skips antimeridian jumps (|Δlon| > 100°).                              */
+  function catmull(pts, seg) {
+    const out = [], n = pts.length;
+    for (let i = 0; i < n; i++) {
+      const p0 = pts[(i - 1 + n) % n], p1 = pts[i],
+            p2 = pts[(i + 1) % n],     p3 = pts[(i + 2) % n];
+      if (Math.abs(p2[0] - p1[0]) > 100) { out.push(p1); continue; }
+      for (let s = 0; s < seg; s++) {
+        const t = s / seg, t2 = t * t, t3 = t2 * t;
+        out.push([
+          .5*((2*p1[0])+(-p0[0]+p2[0])*t+(2*p0[0]-5*p1[0]+4*p2[0]-p3[0])*t2+(-p0[0]+3*p1[0]-3*p2[0]+p3[0])*t3),
+          .5*((2*p1[1])+(-p0[1]+p2[1])*t+(2*p0[1]-5*p1[1]+4*p2[1]-p3[1])*t2+(-p0[1]+3*p1[1]-3*p2[1]+p3[1])*t3)
+        ]);
       }
-      prev = code;
     }
-    return new Uint8Array(out);
+    return out;
   }
 
-  // ── GIF parser ─────────────────────────────────────────────────────────────
-  async function parseGIF(url) {
-    const res = await fetch(url);
-    const b   = new Uint8Array(await res.arrayBuffer());
-    let pos = 6;
+  /* ─── Control points [lon, lat] — key coastal vertices ────────────────── */
+  const RAW = [
 
-    const gw = b[pos] | (b[pos+1]<<8); pos+=2;
-    const gh = b[pos] | (b[pos+1]<<8); pos+=2;
-    const pk0 = b[pos++]; pos+=2;
+  // ── North America ─────────────────────────────────────────────────────────
+  [[-168,60],[-165,64],[-163,68],[-160,70],[-156,72],[-148,70],
+   [-140,68],[-136,67],[-134,58],[-130,54],[-128,52],[-126,50],
+   [-124,48],[-124,46],[-124,44],[-122,38],[-120,35],[-117,33],
+   [-114,30],[-110,24],[-106,23],[-105,20],[-100,18],[-96,16],
+   [-90,16],[-88,16],[-86,14],[-84,11],[-80,9],[-77,8],
+   [-80,25],[-80,27],[-81,29],[-81,31],[-80,33],
+   [-76,35],[-76,37],[-75,38],[-74,40],[-72,41],[-71,42],
+   [-70,42],[-70,44],[-67,45],[-64,44],[-60,47],[-53,47],
+   [-56,50],[-60,46],[-64,44],[-65,44],[-66,45],
+   [-60,48],[-56,51],[-55,53],[-60,56],[-64,60],
+   [-64,63],[-68,64],[-72,68],[-80,72],[-90,72],
+   [-100,73],[-115,72],[-128,70],[-140,68],[-148,68],
+   [-156,72],[-160,70],[-168,60]],
 
-    let gct = null;
-    if (pk0 >> 7) { const sz = 3*(2<<(pk0&7)); gct = b.slice(pos, pos+sz); pos+=sz; }
+  // ── Greenland ─────────────────────────────────────────────────────────────
+  [[-55,76],[-44,76],[-30,78],[-18,76],[-17,72],[-17,68],
+   [-22,65],[-32,63],[-42,60],[-48,62],[-52,66],[-52,70],[-55,76]],
 
-    const comp = document.createElement('canvas');
-    comp.width = gw; comp.height = gh;
-    const cc = comp.getContext('2d');
-    cc.fillStyle = '#000'; cc.fillRect(0, 0, gw, gh);
+  // ── South America ─────────────────────────────────────────────────────────
+  [[-80,12],[-76,10],[-72,12],[-68,12],[-64,11],[-60,10],
+   [-55,6],[-52,4],[-50,2],[-48,0],[-46,-2],[-44,-2],
+   [-40,-4],[-38,-6],[-36,-10],[-35,-12],[-36,-14],[-38,-18],
+   [-40,-20],[-42,-23],[-44,-24],[-48,-28],[-50,-30],
+   [-52,-32],[-52,-34],[-54,-36],[-58,-40],[-62,-44],
+   [-65,-46],[-66,-50],[-68,-54],[-68,-56],[-72,-52],
+   [-75,-52],[-72,-46],[-72,-40],[-68,-38],[-70,-32],
+   [-72,-24],[-70,-18],[-68,-12],[-70,-4],[-72,0],
+   [-75,2],[-76,6],[-78,8],[-80,10],[-80,12]],
 
-    const frames = [];
-    let delay=100, transpIdx=-1, disposal=0, prevSnap=null;
+  // ── Europe ────────────────────────────────────────────────────────────────
+  [[-10,36],[-6,36],[0,36],[4,36],[8,36],[12,38],
+   [16,38],[20,38],[24,38],[28,40],[30,42],[36,36],
+   [36,38],[32,42],[28,44],[26,44],[24,48],[22,52],
+   [18,54],[14,56],[10,57],[8,56],[4,52],[0,50],
+   [-2,50],[-4,48],[-4,44],[-6,42],[-8,40],[-10,38],[-10,36]],
 
-    while (pos < b.length && frames.length < MAX_FRAMES) {
-      const id = b[pos++];
+  // ── Scandinavia ───────────────────────────────────────────────────────────
+  [[4,58],[8,58],[10,56],[14,56],[16,58],[20,60],
+   [24,62],[26,64],[28,66],[28,68],[28,70],[24,72],
+   [20,70],[18,68],[16,68],[14,66],[12,64],[10,62],
+   [8,60],[4,58]],
 
-      if (id === 0x21) {
-        const label = b[pos++];
-        if (label === 0xF9) {
-          pos++;
-          const f = b[pos++];
-          delay      = (b[pos]|(b[pos+1]<<8))*10; pos+=2;
-          transpIdx  = (f & 1) ? b[pos] : -1;
-          disposal   = (f >> 3) & 7;
-          pos+=2;
-        } else {
-          while (true) { const sz=b[pos++]; if (!sz) break; pos+=sz; }
-        }
+  // ── Iberian Peninsula ─────────────────────────────────────────────────────
+  [[-10,36],[-8,36],[-4,36],[0,40],[2,42],[0,44],
+   [-4,44],[-8,42],[-10,40],[-10,36]],
 
-      } else if (id === 0x2C) {
-        const fl=b[pos]|(b[pos+1]<<8); pos+=2;
-        const ft=b[pos]|(b[pos+1]<<8); pos+=2;
-        const fw=b[pos]|(b[pos+1]<<8); pos+=2;
-        const fh=b[pos]|(b[pos+1]<<8); pos+=2;
-        const pk2=b[pos++];
-        const interlaced=(pk2>>6)&1;
+  // ── Italy ─────────────────────────────────────────────────────────────────
+  [[8,44],[10,44],[14,42],[16,40],[16,38],[14,36],
+   [12,38],[10,40],[8,44]],
 
-        let ct=gct;
-        if (pk2>>7) { const sz=3*(2<<(pk2&7)); ct=b.slice(pos,pos+sz); pos+=sz; }
+  // ── Balkans / Greece ──────────────────────────────────────────────────────
+  [[20,42],[24,42],[26,42],[26,40],[24,38],[22,38],
+   [20,40],[20,42]],
 
-        const minCode=b[pos++];
-        const raw=[];
-        while (true) { const sz=b[pos++]; if (!sz) break; for (let i=0;i<sz;i++) raw.push(b[pos++]); }
+  // ── Africa ────────────────────────────────────────────────────────────────
+  [[-18,14],[-16,10],[-14,8],[-14,5],[-10,5],[-8,4],
+   [-4,4],[0,4],[4,4],[8,4],[10,4],[12,2],[14,0],
+   [14,-4],[16,-6],[18,-8],[20,-10],[24,-12],[28,-14],
+   [32,-18],[34,-22],[36,-24],[38,-24],[40,-18],[42,-12],
+   [44,-8],[44,-4],[44,2],[44,8],[44,12],[42,12],
+   [40,14],[38,18],[36,22],[34,22],[30,24],[28,30],
+   [30,32],[34,28],[34,32],[36,34],[36,36],
+   [28,36],[22,38],[18,38],[12,36],[4,34],
+   [0,32],[-4,34],[-8,36],[-14,24],[-16,20],[-18,16],[-18,14]],
 
-        const indices = lzwDecode(minCode, raw);
+  // ── Asia — western block ───────────────────────────────────────────────────
+  [[26,42],[30,42],[36,38],[40,40],[44,42],[48,40],
+   [52,38],[56,28],[58,24],[62,24],[66,24],[70,22],
+   [74,22],[78,20],[80,14],[80,10],[80,8],
+   [84,14],[86,18],[90,22],[92,24],[94,22],
+   [98,20],[100,6],[102,2],[104,4],[106,6],
+   [108,12],[108,16],[106,20],[104,24],[106,28],
+   [108,32],[112,34],[116,36],[120,40],
+   [124,40],[128,40],[130,34],[132,34],
+   [134,32],[128,30],[122,28],[118,24],[116,22],
+   [110,20],[110,16],[112,12],[110,10],
+   [106,10],[102,4],[100,2],[96,20],
+   [100,26],[104,30],[106,34],[108,36],
+   [108,40],[110,42],[114,44],[120,48],
+   [126,50],[132,48],[136,48],[138,44],
+   [140,40],[140,38],[138,38],[136,36],
+   [132,34],[130,32],
+   [80,30],[76,34],[72,36],[70,40],
+   [64,40],[60,40],[56,40],[52,42],
+   [48,40],[44,40],[40,40],[36,42],[30,44],[26,42]],
 
-        if      (disposal===2)             cc.clearRect(fl,ft,fw,fh);
-        else if (disposal===3 && prevSnap) cc.putImageData(prevSnap,0,0);
-        if      (disposal===3)             prevSnap = cc.getImageData(0,0,gw,gh);
+  // ── Arabian Peninsula ─────────────────────────────────────────────────────
+  [[36,28],[38,22],[40,18],[42,14],[44,12],[46,14],
+   [50,12],[54,16],[56,22],[58,24],[56,28],
+   [52,24],[48,22],[44,22],[40,22],[36,24],[36,28]],
 
-        const img = cc.createImageData(fw, fh);
+  // ── Indian subcontinent ───────────────────────────────────────────────────
+  [[66,24],[68,24],[70,22],[74,22],[76,22],[78,20],
+   [80,16],[80,12],[80,10],[80,8],
+   [78,8],[76,10],[74,14],[72,18],[70,20],[68,22],
+   [64,22],[62,22],[60,22],[62,24],[64,24],[66,24]],
 
-        let rowMap=null;
-        if (interlaced) {
-          rowMap = new Int32Array(fh); let r=0;
-          for (const [s,st] of [[0,8],[4,8],[2,4],[1,2]])
-            for (let y=s; y<fh; y+=st) rowMap[y]=r++;
-        }
+  // ── Indochina ─────────────────────────────────────────────────────────────
+  [[96,28],[98,24],[100,22],[104,20],[106,18],
+   [108,16],[108,12],[106,10],[104,6],[104,2],
+   [102,2],[100,4],[100,6],[98,8],[98,12],
+   [96,16],[96,20],[96,24],[96,28]],
 
-        for (let y=0; y<fh; y++) {
-          const sy = interlaced ? rowMap[y] : y;
-          for (let x=0; x<fw; x++) {
-            const idx = indices[sy*fw+x];
-            const dst = (y*fw+x)*4;
-            if (idx===transpIdx) {
-              img.data[dst+3]=0;
-            } else {
-              img.data[dst]  =ct[idx*3];
-              img.data[dst+1]=ct[idx*3+1];
-              img.data[dst+2]=ct[idx*3+2];
-              img.data[dst+3]=255;
-            }
-          }
-        }
+  // ── Malay Peninsula ───────────────────────────────────────────────────────
+  [[100,6],[102,4],[104,4],[106,4],[104,2],[102,2],[100,4],[100,6]],
 
-        cc.putImageData(img, fl, ft);
-        // createImageBitmap faz upload para GPU; libera memória CPU
-        const bitmap = await createImageBitmap(comp);
-        frames.push({ delay: Math.max(delay, 20), bitmap });
-        disposal=0; transpIdx=-1;
+  // ── Sumatra ───────────────────────────────────────────────────────────────
+  [[96,6],[98,4],[100,4],[102,2],[104,0],[106,-2],
+   [106,-4],[104,-4],[102,-2],[100,-2],[98,0],[96,2],[96,4],[96,6]],
 
-      } else if (id===0x3B) break;
-    }
+  // ── Borneo ────────────────────────────────────────────────────────────────
+  [[108,6],[112,6],[116,4],[118,4],[118,2],[116,0],
+   [114,-2],[112,-2],[110,0],[108,2],[108,4],[108,6]],
 
-    return { width:gw, height:gh, frames };
+  // ── Java ──────────────────────────────────────────────────────────────────
+  [[106,-6],[108,-6],[110,-7],[112,-7],[114,-8],[116,-8],
+   [112,-8],[108,-8],[106,-6]],
+
+  // ── Sulawesi ──────────────────────────────────────────────────────────────
+  [[120,2],[122,0],[124,-2],[124,0],[122,2],[122,4],[120,4],[120,2]],
+
+  // ── Japan — Honshu ────────────────────────────────────────────────────────
+  [[130,32],[132,34],[134,34],[136,36],[138,36],[138,38],
+   [140,38],[142,40],[144,42],[144,44],[142,44],[140,44],
+   [138,42],[136,40],[134,38],[132,36],[130,34],[130,32]],
+
+  // ── Japan — Hokkaido ─────────────────────────────────────────────────────
+  [[140,44],[142,44],[144,44],[144,46],[142,46],[140,45],[140,44]],
+
+  // ── Korean Peninsula ─────────────────────────────────────────────────────
+  [[124,38],[126,36],[128,36],[130,38],[128,40],[126,40],[124,40],[124,38]],
+
+  // ── Taiwan ────────────────────────────────────────────────────────────────
+  [[120,22],[122,22],[122,24],[122,26],[120,24],[120,22]],
+
+  // ── Philippines — Luzon ──────────────────────────────────────────────────
+  [[118,16],[120,16],[122,18],[122,20],[120,20],[118,18],[118,16]],
+
+  // ── Australia ─────────────────────────────────────────────────────────────
+  [[114,-22],[116,-20],[118,-18],[120,-16],[122,-16],
+   [124,-14],[126,-14],[128,-14],[130,-14],[132,-12],
+   [134,-12],[136,-12],[138,-14],[140,-16],[142,-18],
+   [144,-18],[146,-18],[148,-20],[150,-22],[152,-24],
+   [152,-26],[150,-28],[150,-30],[150,-34],[148,-38],
+   [146,-38],[144,-38],[140,-36],[138,-34],[136,-34],
+   [132,-34],[130,-32],[128,-32],[126,-34],[124,-32],
+   [122,-28],[118,-26],[116,-24],[114,-26],[114,-22]],
+
+  // ── New Zealand — North ───────────────────────────────────────────────────
+  [[172,-36],[174,-36],[176,-38],[178,-38],[176,-40],
+   [174,-40],[172,-38],[172,-36]],
+
+  // ── New Zealand — South ───────────────────────────────────────────────────
+  [[166,-44],[168,-44],[170,-44],[172,-44],[172,-46],
+   [170,-47],[168,-46],[166,-45],[166,-44]],
+
+  // ── UK ────────────────────────────────────────────────────────────────────
+  [[-6,50],[-4,50],[-2,50],[0,52],[2,52],[2,54],
+   [0,56],[-2,58],[-4,58],[-4,56],[-4,54],[-6,52],[-6,50]],
+
+  // ── Ireland ───────────────────────────────────────────────────────────────
+  [[-10,52],[-8,52],[-6,54],[-8,56],[-10,54],[-10,52]],
+
+  // ── Iceland ───────────────────────────────────────────────────────────────
+  [[-24,64],[-20,64],[-14,64],[-14,66],[-18,66],[-22,66],[-24,65],[-24,64]],
+
+  // ── Sri Lanka ─────────────────────────────────────────────────────────────
+  [[80,10],[80,8],[80,6],[82,6],[82,8],[80,10]],
+
+  // ── Madagascar ────────────────────────────────────────────────────────────
+  [[44,-14],[46,-14],[50,-16],[50,-20],[48,-24],
+   [44,-24],[44,-20],[44,-16],[44,-14]],
+
+  // ── Cuba (simplified) ─────────────────────────────────────────────────────
+  [[-74,20],[-80,22],[-84,22],[-84,20],[-80,20],[-74,20]],
+
+  ]; // end RAW
+
+  /* Pre-compute smooth continents once at load (10 Catmull-Rom segments per pair) */
+  const CONTINENTS = RAW.map(s => catmull(s, 10));
+
+  /* ─── Orthographic projection ────────────────────────────────────────────── */
+  function project(lon, lat, vlon) {
+    const phi = lat  * Math.PI / 180;
+    const dl  = (lon - vlon) * Math.PI / 180;
+    const x3  =  Math.cos(phi) * Math.sin(dl);
+    const y3  = -Math.sin(phi);
+    const z3  =  Math.cos(phi) * Math.cos(dl);
+    if (z3 <= 0) return null;
+    return [cx + x3 * R, cy + y3 * R];
   }
 
-  // ── Playback com cross-fade ────────────────────────────────────────────────
-  parseGIF('_knowledge/videos/terski-earth-2768.gif').then(({ frames }) => {
-    let fi=0, prevFi=0, accum=0, lastTs=null, blendTick=BLEND_FRAMES;
+  let viewLon = 0;
 
-    function draw(ts) {
-      if (!lastTs) lastTs=ts;
-      const dt = Math.min(ts-lastTs, 100); lastTs=ts;
-      accum += dt;
+  function draw() {
+    ctx.clearRect(0, 0, SIZE, SIZE);
+    ctx.save();
 
-      if (accum >= frames[fi].delay * SPEED_FACTOR) {
-        accum -= frames[fi].delay * SPEED_FACTOR;
-        prevFi=fi; fi=(fi+1)%frames.length; blendTick=0;
-      }
+    /* Clip to sphere */
+    ctx.beginPath();
+    ctx.arc(cx, cy, R, 0, Math.PI * 2);
+    ctx.clip();
 
-      ctx.clearRect(0, 0, SIZE, SIZE);
+    /* Ocean */
+    const ocean = ctx.createRadialGradient(
+      cx - R * .28, cy - R * .28, R * .05, cx, cy, R * 1.05);
+    ocean.addColorStop(0,    '#55d4ff');
+    ocean.addColorStop(.30,  '#0d72bb');
+    ocean.addColorStop(.75,  '#062040');
+    ocean.addColorStop(1,    '#020c1e');
+    ctx.fillStyle = ocean;
+    ctx.fillRect(0, 0, SIZE, SIZE);
 
-      // Clip circular: garante que fundo escuro do espaço não vaza para a seção
-      ctx.save();
+    /* Continents */
+    ctx.fillStyle   = 'rgba(38,155,75,.90)';
+    ctx.strokeStyle = 'rgba(70,210,110,.20)';
+    ctx.lineWidth   = 0.6;
+
+    for (const shape of CONTINENTS) {
+      const pts = shape.map(([lo, la]) => project(lo, la, viewLon));
+      if (pts.filter(Boolean).length < 4) continue;
+
       ctx.beginPath();
-      ctx.arc(SIZE/2, SIZE/2, SIZE/2 - 2, 0, Math.PI*2);
-      ctx.clip();
-
-      if (blendTick < BLEND_FRAMES) {
-        const alpha = blendTick / BLEND_FRAMES;
-        ctx.globalAlpha = 1-alpha;
-        ctx.drawImage(frames[prevFi].bitmap, 0,0,SIZE,SIZE);
-        ctx.globalAlpha = alpha;
-        ctx.drawImage(frames[fi].bitmap,     0,0,SIZE,SIZE);
-        ctx.globalAlpha = 1;
-        blendTick++;
-      } else {
-        ctx.drawImage(frames[fi].bitmap, 0,0,SIZE,SIZE);
+      let pen = false;
+      for (const p of pts) {
+        if (!p)    { pen = false; continue; }
+        if (!pen)  { ctx.moveTo(p[0], p[1]); pen = true; }
+        else         ctx.lineTo(p[0], p[1]);
       }
-
-      // Brilho atmosférico na borda
-      const atm = ctx.createRadialGradient(SIZE/2,SIZE/2,SIZE*.43,SIZE/2,SIZE/2,SIZE/2);
-      atm.addColorStop(0,'transparent');
-      atm.addColorStop(1,'rgba(80,180,255,.22)');
-      ctx.fillStyle=atm;
-      ctx.fillRect(0,0,SIZE,SIZE);
-
-      ctx.restore();
-
-      requestAnimationFrame(draw);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
     }
 
+    /* Polar ice caps */
+    ctx.fillStyle = 'rgba(210,240,255,.50)';
+    for (const lat of [78, -72]) {
+      const ring = [];
+      for (let lo = -180; lo <= 180; lo += 4)  {
+        const p = project(lo, lat, viewLon);
+        if (p) ring.push(p);
+      }
+      if (ring.length > 3) {
+        ctx.beginPath();
+        ring.forEach((p, i) => i === 0 ? ctx.moveTo(p[0], p[1]) : ctx.lineTo(p[0], p[1]));
+        ctx.closePath();
+        ctx.fill();
+      }
+    }
+
+    /* Specular highlight */
+    const spec = ctx.createRadialGradient(
+      cx - R * .3, cy - R * .3, 0, cx - R * .3, cy - R * .3, R * .65);
+    spec.addColorStop(0, 'rgba(255,255,255,.18)');
+    spec.addColorStop(1, 'transparent');
+    ctx.fillStyle = spec;
+    ctx.fillRect(0, 0, SIZE, SIZE);
+
+    /* Atmosphere edge */
+    const atm = ctx.createRadialGradient(cx, cy, R * .82, cx, cy, R);
+    atm.addColorStop(0, 'transparent');
+    atm.addColorStop(1, 'rgba(100,200,255,.22)');
+    ctx.fillStyle = atm;
+    ctx.fillRect(0, 0, SIZE, SIZE);
+
+    ctx.restore();
+
+    /* Night-side shadow */
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(cx, cy, R, 0, Math.PI * 2);
+    ctx.clip();
+    const night = ctx.createRadialGradient(cx + R * .5, cy, 0, cx + R * .35, cy, R * 1.15);
+    night.addColorStop(0,    'transparent');
+    night.addColorStop(.55,  'transparent');
+    night.addColorStop(1,    'rgba(0,4,18,.60)');
+    ctx.fillStyle = night;
+    ctx.fillRect(0, 0, SIZE, SIZE);
+    ctx.restore();
+
+    /* Slow rotation: ~5.5 min per full turn */
+    viewLon = (viewLon + 0.018) % 360;
     requestAnimationFrame(draw);
+  }
 
-  }).catch(err => {
-    console.warn('GIF player:', err);
-    const img = document.createElement('img');
-    img.src = '_knowledge/videos/terski-earth-2768.gif';
-    img.style.cssText = 'position:absolute;width:100%;height:100%;top:0;left:0;';
-    canvas.parentNode.insertBefore(img, canvas);
-    canvas.style.display = 'none';
-  });
-
+  draw();
 })();
