@@ -122,6 +122,7 @@ $FILES = @(
     "_knowledge/logos/XXV Cong. Bras. Med. Fisica banner.jpg",
     "_knowledge/logos/XXVII_CBMFR1.jpg",
     # Vídeo
+    "_knowledge/videos/globe-slow.mp4",
     "_knowledge/videos/globe-slow.webm"
 )
 
