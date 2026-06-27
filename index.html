@@ -10,6 +10,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="_knowledge/logos/Logo-USP-300x161-removebg-preview.png">
+<link rel="preload" as="image" href="_knowledge/logos/LogoUFSCar.png">
+<link rel="preload" as="image" href="_knowledge/logos/logo HC.png">
+<link rel="preload" as="image" href="_knowledge/logos/INPI.png">
+<link rel="preload" as="image" href="_knowledge/logos/logo fapesp.png">
+<link rel="preload" as="image" href="_knowledge/logos/Globonews_logo.png">
 <style>
 /* ═══════════════════════════════════════════
    RESET & VARIABLES
@@ -550,8 +556,8 @@ footer{background:#050b07;padding:5rem 5vw 2.5rem;border-top:1px solid var(--bor
    HERO VIDEO BG + OVERLAY
 ═══════════════════════════════════════════ */
 .hero-video-bg{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none}
-.hero-video-bg iframe{position:absolute;top:50%;left:50%;width:100vw;height:56.25vw;min-height:100vh;min-width:177.78vh;transform:translate(-50%,-50%);opacity:0;border:0;pointer-events:none;animation:hbgfade .6s 2.2s forwards}
-@keyframes hbgfade{to{opacity:.80}}
+.hero-video-bg iframe{position:absolute;top:50%;left:50%;width:100vw;height:56.25vw;min-height:100vh;min-width:177.78vh;transform:translate(-50%,-50%);opacity:.80;border:0;pointer-events:none}
+#hvshield{position:absolute;inset:0;z-index:2;background:#080d0a;pointer-events:none}
 .hero-video-overlay{
   position:absolute;inset:0;z-index:1;
   background:linear-gradient(
@@ -615,6 +621,7 @@ footer{background:#050b07;padding:5rem 5vw 2.5rem;border-top:1px solid var(--bor
   <div class="hero-glow"></div>
   <div class="hero-glow-o"></div>
   <div class="hero-grid-lines"></div>
+  <div id="hvshield"></div>
 
   <div class="hero-inner">
     <div class="hero-left">
@@ -674,64 +681,60 @@ footer{background:#050b07;padding:5rem 5vw 2.5rem;border-top:1px solid var(--bor
   <div style="display:flex;overflow:hidden;mask-image:linear-gradient(90deg,transparent,black 6%,black 94%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,black 6%,black 94%,transparent)">
     <div class="marquee-track" style="animation-duration:54s">
       <!-- Logos — set 1 -->
-      <div class="mq-logo"><img src="_knowledge/logos/Logo-USP-300x161-removebg-preview.png" alt="USP" loading="lazy"><span>Univ. São Paulo</span></div>
-      <div class="mq-logo"><img src="_knowledge/logos/LogoUFSCar.png" alt="UFSCar" loading="lazy" style="height:52px;max-width:160px"><span>UFSCar</span></div>
-      <div class="mq-logo"><img src="_knowledge/logos/logo HC.png" alt="Hospital das Clínicas" loading="lazy"><span>Hosp. Clínicas FMUSP</span></div>
-      <div class="mq-logo"><img src="_knowledge/logos/DNAUSP).png" alt="DNA USP" loading="lazy"><span>DNA USP</span></div>
-      <div class="mq-logo"><img src="_knowledge/logos/INPI.png" alt="INPI" loading="lazy"><span>INPI · Patentes</span></div>
-      <div class="mq-logo"><img src="_knowledge/logos/WIPO-Logo-470x189.png" alt="WIPO" loading="lazy" style="height:52px;max-width:160px"><span>WIPO</span></div>
-      <div class="mq-logo"><img src="_knowledge/logos/tokyo_2025.png" alt="World Physiotherapy Congress 2025 Tokyo" loading="lazy" style="height:52px;max-width:160px;mix-blend-mode:multiply"></div>
-      <div class="mq-logo"><img src="_knowledge/logos/logo_APAE.png" alt="APAE" loading="lazy" style="height:52px;max-width:160px"><span>APAE</span></div>
-      <div class="mq-logo"><img src="_knowledge/logos/Logo HB.png" alt="Logo HB" loading="lazy" style="height:52px;max-width:160px;mix-blend-mode:screen"><span>HB</span></div>
-
-      <div class="mq-logo"><img src="_knowledge/logos/banner-evento.png" alt="Evento" loading="lazy" style="height:44px;max-width:140px"><span>Evento</span></div>
-      <div class="mq-logo"><img src="_knowledge/logos/X-reality.png" alt="X Reality" loading="lazy" style="height:44px;max-width:140px"><span>X Reality</span></div>
-
-      <div class="mq-logo"><img src="_knowledge/logos/VR week.png" alt="VR Week" loading="lazy" style="height:44px;max-width:140px"><span>VR Week</span></div>
-      <div class="mq-logo"><img src="_knowledge/logos/Globonews_logo.png" alt="GloboNews" loading="lazy"><span>GloboNews</span></div>
-      <div class="mq-logo"><img src="_knowledge/logos/logo_record.png" alt="Rede Record" loading="lazy" style="height:36px;max-width:120px"><span>Rede Record</span></div>
-      <div class="mq-logo"><img src="_knowledge/logos/logo folha.png" alt="Folha de S.Paulo" loading="lazy"><span>Folha de S.Paulo</span></div>
-      <div class="mq-logo"><img src="_knowledge/logos/campuspartybrasil2014logo.png" alt="Campus Party Brasil" loading="lazy"><span>Campus Party</span></div>
-      <div class="mq-logo"><img src="_knowledge/logos/NTT).png" alt="NTT Data" loading="lazy" style="height:52px;max-width:160px"><span>NTT Data</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/Logo-USP-300x161-removebg-preview.png" alt="USP" loading="eager" decoding="async"><span>Univ. São Paulo</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/LogoUFSCar.png" alt="UFSCar" loading="eager" decoding="async" style="height:52px;max-width:160px"><span>UFSCar</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/logo HC.png" alt="Hospital das Clínicas" loading="eager" decoding="async"><span>Hosp. Clínicas FMUSP</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/DNAUSP).png" alt="DNA USP" loading="eager" decoding="async"><span>DNA USP</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/INPI.png" alt="INPI" loading="eager" decoding="async"><span>INPI · Patentes</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/WIPO-Logo-470x189.png" alt="WIPO" loading="eager" decoding="async" style="height:52px;max-width:160px"><span>WIPO</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/tokyo_2025.png" alt="World Physiotherapy Congress 2025 Tokyo" loading="eager" decoding="async" style="height:52px;max-width:160px;mix-blend-mode:multiply"></div>
+      <div class="mq-logo"><img src="_knowledge/logos/logo_APAE.png" alt="APAE" loading="eager" decoding="async" style="height:52px;max-width:160px"><span>APAE</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/Logo HB.png" alt="Logo HB" loading="eager" decoding="async" style="height:52px;max-width:160px;mix-blend-mode:screen"><span>HB</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/banner-evento.png" alt="Evento" loading="eager" decoding="async" style="height:44px;max-width:140px"><span>Evento</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/X-reality.png" alt="X Reality" loading="eager" decoding="async" style="height:44px;max-width:140px"><span>X Reality</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/VR week.png" alt="VR Week" loading="eager" decoding="async" style="height:44px;max-width:140px"><span>VR Week</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/Globonews_logo.png" alt="GloboNews" loading="eager" decoding="async"><span>GloboNews</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/logo_record.png" alt="Rede Record" loading="eager" decoding="async" style="height:36px;max-width:120px"><span>Rede Record</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/logo folha.png" alt="Folha de S.Paulo" loading="eager" decoding="async"><span>Folha de S.Paulo</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/campuspartybrasil2014logo.png" alt="Campus Party Brasil" loading="eager" decoding="async"><span>Campus Party</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/NTT).png" alt="NTT Data" loading="eager" decoding="async" style="height:52px;max-width:160px"><span>NTT Data</span></div>
       <!-- Logos — set 2 (duplicata para loop contínuo) -->
-      <div class="mq-logo"><img src="_knowledge/logos/Logo-USP-300x161-removebg-preview.png" alt="USP" loading="lazy"><span>Univ. São Paulo</span></div>
-      <div class="mq-logo"><img src="_knowledge/logos/LogoUFSCar.png" alt="UFSCar" loading="lazy" style="height:52px;max-width:160px"><span>UFSCar</span></div>
-      <div class="mq-logo"><img src="_knowledge/logos/logo HC.png" alt="Hospital das Clínicas" loading="lazy"><span>Hosp. Clínicas FMUSP</span></div>
-      <div class="mq-logo"><img src="_knowledge/logos/DNAUSP).png" alt="DNA USP" loading="lazy"><span>DNA USP</span></div>
-      <div class="mq-logo"><img src="_knowledge/logos/INPI.png" alt="INPI" loading="lazy"><span>INPI · Patentes</span></div>
-      <div class="mq-logo"><img src="_knowledge/logos/WIPO-Logo-470x189.png" alt="WIPO" loading="lazy" style="height:52px;max-width:160px"><span>WIPO</span></div>
-      <div class="mq-logo"><img src="_knowledge/logos/tokyo_2025.png" alt="World Physiotherapy Congress 2025 Tokyo" loading="lazy" style="height:52px;max-width:160px;mix-blend-mode:multiply"></div>
-      <div class="mq-logo"><img src="_knowledge/logos/logo_APAE.png" alt="APAE" loading="lazy" style="height:52px;max-width:160px"><span>APAE</span></div>
-      <div class="mq-logo"><img src="_knowledge/logos/Logo HB.png" alt="Logo HB" loading="lazy" style="height:52px;max-width:160px;mix-blend-mode:screen"><span>HB</span></div>
-
-      <div class="mq-logo"><img src="_knowledge/logos/banner-evento.png" alt="Evento" loading="lazy" style="height:44px;max-width:140px"><span>Evento</span></div>
-      <div class="mq-logo"><img src="_knowledge/logos/X-reality.png" alt="X Reality" loading="lazy" style="height:44px;max-width:140px"><span>X Reality</span></div>
-
-      <div class="mq-logo"><img src="_knowledge/logos/VR week.png" alt="VR Week" loading="lazy" style="height:44px;max-width:140px"><span>VR Week</span></div>
-      <div class="mq-logo"><img src="_knowledge/logos/Globonews_logo.png" alt="GloboNews" loading="lazy"><span>GloboNews</span></div>
-      <div class="mq-logo"><img src="_knowledge/logos/logo_record.png" alt="Rede Record" loading="lazy" style="height:36px;max-width:120px"><span>Rede Record</span></div>
-      <div class="mq-logo"><img src="_knowledge/logos/logo folha.png" alt="Folha de S.Paulo" loading="lazy"><span>Folha de S.Paulo</span></div>
-      <div class="mq-logo"><img src="_knowledge/logos/campuspartybrasil2014logo.png" alt="Campus Party Brasil" loading="lazy"><span>Campus Party</span></div>
-      <div class="mq-logo"><img src="_knowledge/logos/NTT).png" alt="NTT Data" loading="lazy" style="height:52px;max-width:160px"><span>NTT Data</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/Logo-USP-300x161-removebg-preview.png" alt="USP" loading="eager" decoding="async"><span>Univ. São Paulo</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/LogoUFSCar.png" alt="UFSCar" loading="eager" decoding="async" style="height:52px;max-width:160px"><span>UFSCar</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/logo HC.png" alt="Hospital das Clínicas" loading="eager" decoding="async"><span>Hosp. Clínicas FMUSP</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/DNAUSP).png" alt="DNA USP" loading="eager" decoding="async"><span>DNA USP</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/INPI.png" alt="INPI" loading="eager" decoding="async"><span>INPI · Patentes</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/WIPO-Logo-470x189.png" alt="WIPO" loading="eager" decoding="async" style="height:52px;max-width:160px"><span>WIPO</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/tokyo_2025.png" alt="World Physiotherapy Congress 2025 Tokyo" loading="eager" decoding="async" style="height:52px;max-width:160px;mix-blend-mode:multiply"></div>
+      <div class="mq-logo"><img src="_knowledge/logos/logo_APAE.png" alt="APAE" loading="eager" decoding="async" style="height:52px;max-width:160px"><span>APAE</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/Logo HB.png" alt="Logo HB" loading="eager" decoding="async" style="height:52px;max-width:160px;mix-blend-mode:screen"><span>HB</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/banner-evento.png" alt="Evento" loading="eager" decoding="async" style="height:44px;max-width:140px"><span>Evento</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/X-reality.png" alt="X Reality" loading="eager" decoding="async" style="height:44px;max-width:140px"><span>X Reality</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/VR week.png" alt="VR Week" loading="eager" decoding="async" style="height:44px;max-width:140px"><span>VR Week</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/Globonews_logo.png" alt="GloboNews" loading="eager" decoding="async"><span>GloboNews</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/logo_record.png" alt="Rede Record" loading="eager" decoding="async" style="height:36px;max-width:120px"><span>Rede Record</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/logo folha.png" alt="Folha de S.Paulo" loading="eager" decoding="async"><span>Folha de S.Paulo</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/campuspartybrasil2014logo.png" alt="Campus Party Brasil" loading="eager" decoding="async"><span>Campus Party</span></div>
+      <div class="mq-logo"><img src="_knowledge/logos/NTT).png" alt="NTT Data" loading="eager" decoding="async" style="height:52px;max-width:160px"><span>NTT Data</span></div>
     </div>
   </div>
   <!-- Segunda linha — sentido inverso -->
   <div style="display:flex;overflow:hidden;margin-top:.75rem;mask-image:linear-gradient(90deg,transparent,black 6%,black 94%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,black 6%,black 94%,transparent)">
     <div class="marquee-track-r" style="animation-duration:48s">
       <!-- set 1 -->
-      <div class="mq-logo"><img src="_knowledge/logos/physio-logo.png" alt="World Physiotherapy" loading="lazy" style="height:44px;max-width:140px"></div>
-      <div class="mq-logo"><img src="_knowledge/logos/logomakerday.jpg" alt="Maker Day" loading="lazy" style="height:36px;max-width:120px"></div>
-      <div class="mq-logo"><img src="_knowledge/logos/logo-vertical-300x213.png" alt="Parceiro" loading="lazy" style="height:78px;max-width:220px;mix-blend-mode:screen"></div>
-      <div class="mq-logo"><img src="_knowledge/logos/XXV Cong. Bras. Med. Fisica banner.jpg" alt="XXV Congresso Brasileiro de Medicina Física" loading="lazy" style="height:40px;max-width:150px"></div>
-      <div class="mq-logo"><img src="_knowledge/logos/cobrafin.jpeg" alt="COBRAFIN" loading="lazy" style="height:36px;max-width:120px"></div>
-      <div class="mq-logo"><img src="_knowledge/logos/conference_regional.png" alt="Conference Regional" loading="lazy" style="height:44px;max-width:140px"></div>
+      <div class="mq-logo"><img src="_knowledge/logos/physio-logo.png" alt="World Physiotherapy" loading="eager" decoding="async" style="height:44px;max-width:140px"></div>
+      <div class="mq-logo"><img src="_knowledge/logos/logomakerday.jpg" alt="Maker Day" loading="eager" decoding="async" style="height:36px;max-width:120px"></div>
+      <div class="mq-logo"><img src="_knowledge/logos/logo-vertical-300x213.png" alt="Parceiro" loading="eager" decoding="async" style="height:78px;max-width:220px;mix-blend-mode:screen"></div>
+      <div class="mq-logo"><img src="_knowledge/logos/XXV Cong. Bras. Med. Fisica banner.jpg" alt="XXV Congresso Brasileiro de Medicina Física" loading="eager" decoding="async" style="height:40px;max-width:150px"></div>
+      <div class="mq-logo"><img src="_knowledge/logos/cobrafin.jpeg" alt="COBRAFIN" loading="eager" decoding="async" style="height:36px;max-width:120px"></div>
+      <div class="mq-logo"><img src="_knowledge/logos/conference_regional.png" alt="Conference Regional" loading="eager" decoding="async" style="height:44px;max-width:140px"></div>
       <!-- set 2 (loop) -->
-      <div class="mq-logo"><img src="_knowledge/logos/logo-vertical-300x213.png" alt="Parceiro" loading="lazy" style="height:78px;max-width:220px;mix-blend-mode:screen"></div>
-      <div class="mq-logo"><img src="_knowledge/logos/physio-logo.png" alt="World Physiotherapy" loading="lazy" style="height:44px;max-width:140px"></div>
-      <div class="mq-logo"><img src="_knowledge/logos/logomakerday.jpg" alt="Maker Day" loading="lazy" style="height:36px;max-width:120px"></div>
-      <div class="mq-logo"><img src="_knowledge/logos/XXV Cong. Bras. Med. Fisica banner.jpg" alt="XXV Congresso Brasileiro de Medicina Física" loading="lazy" style="height:40px;max-width:150px"></div>
-      <div class="mq-logo"><img src="_knowledge/logos/cobrafin.jpeg" alt="COBRAFIN" loading="lazy" style="height:36px;max-width:120px"></div>
-      <div class="mq-logo"><img src="_knowledge/logos/conference_regional.png" alt="Conference Regional" loading="lazy" style="height:44px;max-width:140px"></div>
+      <div class="mq-logo"><img src="_knowledge/logos/logo-vertical-300x213.png" alt="Parceiro" loading="eager" decoding="async" style="height:78px;max-width:220px;mix-blend-mode:screen"></div>
+      <div class="mq-logo"><img src="_knowledge/logos/physio-logo.png" alt="World Physiotherapy" loading="eager" decoding="async" style="height:44px;max-width:140px"></div>
+      <div class="mq-logo"><img src="_knowledge/logos/logomakerday.jpg" alt="Maker Day" loading="eager" decoding="async" style="height:36px;max-width:120px"></div>
+      <div class="mq-logo"><img src="_knowledge/logos/XXV Cong. Bras. Med. Fisica banner.jpg" alt="XXV Congresso Brasileiro de Medicina Física" loading="eager" decoding="async" style="height:40px;max-width:150px"></div>
+      <div class="mq-logo"><img src="_knowledge/logos/cobrafin.jpeg" alt="COBRAFIN" loading="eager" decoding="async" style="height:36px;max-width:120px"></div>
+      <div class="mq-logo"><img src="_knowledge/logos/conference_regional.png" alt="Conference Regional" loading="eager" decoding="async" style="height:44px;max-width:140px"></div>
     </div>
   </div>
 </div>
@@ -741,22 +744,22 @@ footer{background:#050b07;padding:5rem 5vw 2.5rem;border-top:1px solid var(--bor
 <div class="logos-section">
   <p class="logos-section-label">Fomento · Parceiros científicos · Acelerações</p>
   <div class="logos-grid">
-    <div class="inst-logo"><img src="_knowledge/logos/logo fapesp.png" alt="FAPESP"><span>FAPESP · PIPE</span></div>
-    <div class="inst-logo"><img src="_knowledge/logos/Logo-USP-300x161-removebg-preview.png" alt="USP"><span>Univ. São Paulo</span></div>
-    <div class="inst-logo lg"><img src="_knowledge/logos/LogoUFSCar.png" alt="UFSCar"><span>UFSCar</span></div>
-    <div class="inst-logo"><img src="_knowledge/logos/logo HC.png" alt="Hospital das Clínicas"><span>Hosp. das Clínicas</span></div>
-    <div class="inst-logo lg"><img src="_knowledge/logos/logo_LEFIGE-removebg-preview.png" alt="LEFIGE · FMUSP"><span>LEFIGE · FMUSP</span></div>
-    <div class="inst-logo"><img src="_knowledge/logos/LOGO_medusp.png" alt="Medicina USP"><span>Medicina USP</span></div>
-    <div class="inst-logo"><img src="_knowledge/logos/i-corps.png" alt="I-Corps"><span>I-Corps</span></div>
-    <div class="inst-logo lg"><img src="_knowledge/logos/LIETEC UFSCar.png" alt="LIETEC UFSCar"><span>LIETEC · UFSCar</span></div>
-    <div class="inst-logo lg"><img src="_knowledge/logos/logo_harena.png" alt="Harena"><span>Harena</span></div>
-    <div class="inst-logo"><img src="_knowledge/logos/health.png" alt="Health Innovation"><span>Health Innovation</span></div>
-    <div class="inst-logo"><img src="_knowledge/logos/abstartup.png" alt="ABStartups"><span>ABStartups</span></div>
-    <div class="inst-logo"><img src="_knowledge/logos/Logo HB.png" alt="HB"><span>HB</span></div>
-    <div class="inst-logo lg"><img src="_knowledge/logos/auspin.png" alt="AUSPIN"><span>AUSPIN</span></div>
-    <div class="inst-logo"><img src="_knowledge/logos/logo_ISVR.png" alt="ISVR"><span>ISVR</span></div>
-    <div class="inst-logo"><img src="_knowledge/logos/DNAUSP).png" alt="DNA USP"><span>DNA USP</span></div>
-    <div class="inst-logo"><img src="_knowledge/logos/logo-pipe-m23_u7_16112020180056.png" alt="FAPESP PIPE"><span>PIPE FAPESP</span></div>
+    <div class="inst-logo"><img src="_knowledge/logos/logo fapesp.png" alt="FAPESP" loading="lazy" decoding="async"><span>FAPESP · PIPE</span></div>
+    <div class="inst-logo"><img src="_knowledge/logos/Logo-USP-300x161-removebg-preview.png" alt="USP" loading="lazy" decoding="async"><span>Univ. São Paulo</span></div>
+    <div class="inst-logo lg"><img src="_knowledge/logos/LogoUFSCar.png" alt="UFSCar" loading="lazy" decoding="async"><span>UFSCar</span></div>
+    <div class="inst-logo"><img src="_knowledge/logos/logo HC.png" alt="Hospital das Clínicas" loading="lazy" decoding="async"><span>Hosp. das Clínicas</span></div>
+    <div class="inst-logo lg"><img src="_knowledge/logos/logo_LEFIGE-removebg-preview.png" alt="LEFIGE · FMUSP" loading="lazy" decoding="async"><span>LEFIGE · FMUSP</span></div>
+    <div class="inst-logo"><img src="_knowledge/logos/LOGO_medusp.png" alt="Medicina USP" loading="lazy" decoding="async"><span>Medicina USP</span></div>
+    <div class="inst-logo"><img src="_knowledge/logos/i-corps.png" alt="I-Corps" loading="lazy" decoding="async"><span>I-Corps</span></div>
+    <div class="inst-logo lg"><img src="_knowledge/logos/LIETEC UFSCar.png" alt="LIETEC UFSCar" loading="lazy" decoding="async"><span>LIETEC · UFSCar</span></div>
+    <div class="inst-logo lg"><img src="_knowledge/logos/logo_harena.png" alt="Harena" loading="lazy" decoding="async"><span>Harena</span></div>
+    <div class="inst-logo"><img src="_knowledge/logos/health.png" alt="Health Innovation" loading="lazy" decoding="async"><span>Health Innovation</span></div>
+    <div class="inst-logo"><img src="_knowledge/logos/abstartup.png" alt="ABStartups" loading="lazy" decoding="async"><span>ABStartups</span></div>
+    <div class="inst-logo"><img src="_knowledge/logos/Logo HB.png" alt="HB" loading="lazy" decoding="async"><span>HB</span></div>
+    <div class="inst-logo lg"><img src="_knowledge/logos/auspin.png" alt="AUSPIN" loading="lazy" decoding="async"><span>AUSPIN</span></div>
+    <div class="inst-logo"><img src="_knowledge/logos/logo_ISVR.png" alt="ISVR" loading="lazy" decoding="async"><span>ISVR</span></div>
+    <div class="inst-logo"><img src="_knowledge/logos/DNAUSP).png" alt="DNA USP" loading="lazy" decoding="async"><span>DNA USP</span></div>
+    <div class="inst-logo"><img src="_knowledge/logos/logo-pipe-m23_u7_16112020180056.png" alt="FAPESP PIPE" loading="lazy" decoding="async"><span>PIPE FAPESP</span></div>
   </div>
 </div>
 
@@ -1511,6 +1514,17 @@ const ro = new IntersectionObserver(entries => {
   entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('visible'); ro.unobserve(e.target); } });
 }, { threshold: 0.1, rootMargin:'0px 0px -32px 0px' });
 document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
+
+// ── Hero video shield: oculta controles YT no início e faz fade-out após 2s ──
+(function(){
+  var s = document.getElementById('hvshield');
+  if (!s) return;
+  setTimeout(function(){
+    s.style.transition = 'opacity 0.9s ease';
+    s.style.opacity = '0';
+    setTimeout(function(){ if (s.parentNode) s.parentNode.removeChild(s); }, 1000);
+  }, 2000);
+})();
 
 // ── Pain-items auto-highlight (hero) ──
 (function(){
