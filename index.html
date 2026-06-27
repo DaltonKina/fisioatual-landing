@@ -224,11 +224,11 @@ nav{
 }
 .numbers-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border-radius:var(--r2);overflow:hidden;border:1px solid var(--border);margin-top:3.5rem}
 .num-item{background:rgba(30,50,38,.48);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);padding:2.5rem 1.5rem;display:flex;flex-direction:column;gap:.5rem;transition:background .35s,box-shadow .35s}
-.num-item:hover{background:rgba(8,13,10,.58);box-shadow:inset 0 3px 0 var(--g),inset 0 0 0 1px rgba(0,197,98,.45)}
+.num-item:hover,.num-item.active{background:rgba(8,13,10,.58);box-shadow:inset 0 3px 0 var(--g),inset 0 0 0 1px rgba(0,197,98,.45)}
 .num-big{font-family:var(--fh);font-size:3rem;color:var(--g);line-height:1;transition:font-size .3s ease,text-shadow .3s ease}
-.num-item:hover .num-big{font-size:3.8rem;text-shadow:0 0 32px rgba(0,197,98,.75)}
+.num-item:hover .num-big,.num-item.active .num-big{font-size:3.8rem;text-shadow:0 0 32px rgba(0,197,98,.75)}
 .num-label{font-size:.83rem;color:var(--muted);line-height:1.5;max-width:160px;transition:color .3s,font-size .3s}
-.num-item:hover .num-label{color:var(--text);font-size:.92rem}
+.num-item:hover .num-label,.num-item.active .num-label{color:var(--text);font-size:.92rem}
 .num-source{font-size:.65rem;color:var(--dim);margin-top:.25rem}
 
 /* ═══════════════════════════════════════════
@@ -1509,6 +1509,28 @@ const ro = new IntersectionObserver(entries => {
   entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('visible'); ro.unobserve(e.target); } });
 }, { threshold: 0.1, rootMargin:'0px 0px -32px 0px' });
 document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
+
+// ── Num-items auto-highlight ──
+(function(){
+  const items = document.querySelectorAll('.num-item');
+  if (!items.length) return;
+  let cur = 0, paused = false;
+
+  function activate(i) {
+    items.forEach(el => el.classList.remove('active'));
+    items[i].classList.add('active');
+    cur = i;
+  }
+
+  activate(0);
+  setInterval(() => { if (!paused) activate((cur + 1) % items.length); }, 3500);
+
+  items.forEach((el, i) => {
+    el.addEventListener('mouseenter', () => { paused = true;  activate(i); });
+    el.addEventListener('mouseleave', () => { paused = false; });
+    el.addEventListener('touchstart', () => activate(i), { passive: true });
+  });
+})();
 
 // ── Globe video force-play (mobile autoplay fallback) ──
 (function(){
