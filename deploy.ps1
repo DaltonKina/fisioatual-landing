@@ -55,6 +55,7 @@ function Ftp-Upload($localPath, $remotePath) {
 
 $FILES = @(
     "index.html",
+    "og-image.jpg",
     # Fotos produto
     "_knowledge/fotos/produto/20230824_125510.jpg",
     "_knowledge/fotos/produto/2patente2_t.png",
