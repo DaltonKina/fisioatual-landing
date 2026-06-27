@@ -216,7 +216,6 @@ nav{
 .numbers-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1}
 #earth-globe{position:absolute;right:-500px;top:50%;transform:translateY(-50%);width:1600px;height:900px;pointer-events:none;z-index:0;opacity:.7;mix-blend-mode:screen;filter:brightness(1.6) contrast(1.2) saturate(1.15);object-fit:contain}
 @media(max-width:768px){
-  .hero-video-bg{display:none}
   .numbers-section{overflow:hidden}
   #earth-globe{
     position:absolute;
@@ -613,7 +612,7 @@ footer{background:#050b07;padding:5rem 5vw 2.5rem;border-top:1px solid var(--bor
 <section class="hero" id="hero">
   <!-- Video background -->
   <div class="hero-video-bg">
-    <iframe src="https://www.youtube.com/embed/jE9TiV6GRzU?autoplay=1&mute=1&loop=1&controls=0&playlist=jE9TiV6GRzU&playsinline=1&rel=0&modestbranding=1&disablekb=1" allow="autoplay; encrypted-media" allowfullscreen title="Fisioatual demo"></iframe>
+    <iframe id="yt-hero" src="https://www.youtube.com/embed/jE9TiV6GRzU?autoplay=1&mute=1&controls=0&playsinline=1&rel=0&modestbranding=1&disablekb=1&enablejsapi=1&origin=https://www.fisioatual.com.br" allow="autoplay; encrypted-media" allowfullscreen title="Fisioatual demo"></iframe>
   </div>
   <!-- Gradient: dark top (logo area) → lighter middle (video visible) → dark bottom -->
   <div class="hero-video-overlay"></div>
@@ -1515,7 +1514,33 @@ const ro = new IntersectionObserver(entries => {
 }, { threshold: 0.1, rootMargin:'0px 0px -32px 0px' });
 document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
 
-// ── Hero video shield: oculta controles YT no início e faz fade-out após 2s ──
+// ── Hero background video: loop via IFrame API + play mobile ──
+var _ytHero;
+window.onYouTubeIframeAPIReady = function() {
+  _ytHero = new YT.Player('yt-hero', {
+    events: {
+      onReady: function(e) { e.target.mute(); e.target.playVideo(); },
+      onStateChange: function(e) {
+        if (e.data === 0) { e.target.seekTo(0); e.target.playVideo(); }
+      }
+    }
+  });
+};
+(function(){
+  var tag = document.createElement('script');
+  tag.src = 'https://www.youtube.com/iframe_api';
+  tag.async = true;
+  document.head.appendChild(tag);
+  // Mobile: tenta play após interação do usuário
+  var tryPlay = function() {
+    if (_ytHero && _ytHero.playVideo) { _ytHero.mute(); _ytHero.playVideo(); }
+  };
+  ['touchstart','click','scroll'].forEach(function(ev) {
+    document.addEventListener(ev, tryPlay, { once: true, passive: true });
+  });
+})();
+
+// ── Hero shield: oculta estado inicial do player (sem controles de playlist) ──
 (function(){
   var s = document.getElementById('hvshield');
   if (!s) return;
@@ -1523,7 +1548,7 @@ document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
     s.style.transition = 'opacity 0.9s ease';
     s.style.opacity = '0';
     setTimeout(function(){ if (s.parentNode) s.parentNode.removeChild(s); }, 1000);
-  }, 2000);
+  }, 3000);
 })();
 
 // ── Pain-items auto-highlight (hero) ──
